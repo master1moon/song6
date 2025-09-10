@@ -1,0 +1,711 @@
+/**
+ * إصلاحات إضافية للمظهر الداكن
+ * يعالج جميع مشاكل القراءة والتباين
+ */
+
+/* إصلاحات عامة للنصوص */
+body.dark-theme,
+body.dark-theme * {
+    color: #f0f0f0 !important;
+}
+
+/* استثناءات للألوان الخاصة */
+body.dark-theme .text-primary { color: #60a5fa !important; }
+body.dark-theme .text-secondary { color: #9ca3af !important; }
+body.dark-theme .text-success { color: #34d399 !important; }
+body.dark-theme .text-danger { color: #f87171 !important; }
+body.dark-theme .text-warning { color: #fbbf24 !important; }
+body.dark-theme .text-info { color: #60a5fa !important; }
+body.dark-theme .text-light { color: #f3f4f6 !important; }
+body.dark-theme .text-dark { color: #111827 !important; }
+body.dark-theme .text-muted { color: #9ca3af !important; }
+
+/* إصلاح جميع الجداول */
+body.dark-theme table {
+    background-color: #1a1f2e !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-theme thead,
+body.dark-theme thead * {
+    background-color: #0f141f !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme tbody tr {
+    background-color: #1a1f2e !important;
+}
+
+body.dark-theme tbody tr:nth-child(even) {
+    background-color: #161b28 !important;
+}
+
+body.dark-theme tbody tr:hover {
+    background-color: #252a3a !important;
+}
+
+body.dark-theme td,
+body.dark-theme th {
+    border-color: #2a2f3e !important;
+    color: #f0f0f0 !important;
+}
+
+/* إصلاح الحقول والأزرار */
+body.dark-theme input,
+body.dark-theme textarea,
+body.dark-theme select,
+body.dark-theme .form-control,
+body.dark-theme .form-select {
+    background-color: #1a1f2e !important;
+    color: #f0f0f0 !important;
+    border-color: #3a3f4e !important;
+}
+
+body.dark-theme input:focus,
+body.dark-theme textarea:focus,
+body.dark-theme select:focus,
+body.dark-theme .form-control:focus,
+body.dark-theme .form-select:focus {
+    background-color: #252a3a !important;
+    color: #ffffff !important;
+    border-color: #60a5fa !important;
+    box-shadow: 0 0 0 0.2rem rgba(96, 165, 250, 0.25) !important;
+}
+
+/* إصلاح placeholder */
+body.dark-theme ::placeholder {
+    color: #6b7280 !important;
+    opacity: 1 !important;
+}
+
+/* إصلاح الأزرار */
+body.dark-theme .btn {
+    color: #f0f0f0 !important;
+}
+
+body.dark-theme .btn-primary {
+    background-color: #c4123f !important;
+    border-color: #c4123f !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-secondary {
+    background-color: #4b5563 !important;
+    border-color: #4b5563 !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-outline-primary {
+    color: #60a5fa !important;
+    border-color: #60a5fa !important;
+}
+
+body.dark-theme .btn-outline-primary:hover {
+    background-color: #60a5fa !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-outline-dark {
+    color: #f0f0f0 !important;
+    border-color: #f0f0f0 !important;
+}
+
+body.dark-theme .btn-outline-dark:hover {
+    background-color: #f0f0f0 !important;
+    color: #0f0f0f !important;
+}
+
+/* إصلاح البطاقات والحاويات */
+body.dark-theme .card,
+body.dark-theme .modal-content,
+body.dark-theme .section-content {
+    background-color: #1a1f2e !important;
+    color: #f0f0f0 !important;
+    border-color: #2a2f3e !important;
+}
+
+body.dark-theme .card-header,
+body.dark-theme .modal-header {
+    background-color: #161b28 !important;
+    border-bottom-color: #2a2f3e !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .card-footer,
+body.dark-theme .modal-footer {
+    background-color: #161b28 !important;
+    border-top-color: #2a2f3e !important;
+    color: #f0f0f0 !important;
+}
+
+/* إصلاح القوائم */
+body.dark-theme .list-group-item {
+    background-color: #1a1f2e !important;
+    color: #f0f0f0 !important;
+    border-color: #2a2f3e !important;
+}
+
+body.dark-theme .list-group-item:hover {
+    background-color: #252a3a !important;
+}
+
+body.dark-theme .list-group-item.active {
+    background-color: #c4123f !important;
+    border-color: #c4123f !important;
+    color: #ffffff !important;
+}
+
+/* إصلاح التنبيهات */
+body.dark-theme .alert {
+    color: #ffffff !important;
+}
+
+body.dark-theme .alert-primary {
+    background-color: #1e3a8a !important;
+    border-color: #1e40af !important;
+}
+
+body.dark-theme .alert-success {
+    background-color: #065f46 !important;
+    border-color: #047857 !important;
+}
+
+body.dark-theme .alert-danger {
+    background-color: #7f1d1d !important;
+    border-color: #991b1b !important;
+}
+
+body.dark-theme .alert-warning {
+    background-color: #78350f !important;
+    border-color: #92400e !important;
+}
+
+body.dark-theme .alert-info {
+    background-color: #1e3a8a !important;
+    border-color: #1e40af !important;
+}
+
+/* إصلاح الشارات */
+body.dark-theme .badge {
+    color: #ffffff !important;
+}
+
+/* إصلاح التبويبات */
+body.dark-theme .nav-tabs .nav-link {
+    color: #9ca3af !important;
+}
+
+body.dark-theme .nav-tabs .nav-link:hover {
+    color: #f0f0f0 !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-theme .nav-tabs .nav-link.active {
+    background-color: #1a1f2e !important;
+    color: #ffffff !important;
+    border-color: #3a3f4e #3a3f4e #1a1f2e !important;
+}
+
+/* إصلاح dropdown */
+body.dark-theme .dropdown-menu {
+    background-color: #1a1f2e !important;
+    border-color: #2a2f3e !important;
+}
+
+body.dark-theme .dropdown-item {
+    color: #f0f0f0 !important;
+}
+
+body.dark-theme .dropdown-item:hover {
+    background-color: #252a3a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .dropdown-divider {
+    border-top-color: #2a2f3e !important;
+}
+
+/* إصلاح pagination */
+body.dark-theme .page-link {
+    background-color: #1a1f2e !important;
+    color: #f0f0f0 !important;
+    border-color: #2a2f3e !important;
+}
+
+body.dark-theme .page-link:hover {
+    background-color: #252a3a !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .page-item.active .page-link {
+    background-color: #c4123f !important;
+    border-color: #c4123f !important;
+    color: #ffffff !important;
+}
+
+/* إصلاح progress bar */
+body.dark-theme .progress {
+    background-color: #252a3a !important;
+}
+
+body.dark-theme .progress-bar {
+    background-color: #c4123f !important;
+}
+
+/* إصلاح tooltips */
+body.dark-theme .tooltip-inner {
+    background-color: #252a3a !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-theme .tooltip-arrow::before {
+    border-top-color: #252a3a !important;
+}
+
+/* إصلاح العناوين */
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme h5,
+body.dark-theme h6,
+body.dark-theme .h1,
+body.dark-theme .h2,
+body.dark-theme .h3,
+body.dark-theme .h4,
+body.dark-theme .h5,
+body.dark-theme .h6 {
+    color: #ffffff !important;
+}
+
+/* إصلاح الروابط */
+body.dark-theme a {
+    color: #60a5fa !important;
+}
+
+body.dark-theme a:hover {
+    color: #93bbfc !important;
+}
+
+/* إصلاح أي عنصر قد يكون له خلفية بيضاء */
+body.dark-theme .bg-white,
+body.dark-theme .bg-light {
+    background-color: #1a1f2e !important;
+    color: #f0f0f0 !important;
+}
+
+/* إصلاح الحدود */
+body.dark-theme .border,
+body.dark-theme .border-top,
+body.dark-theme .border-bottom,
+body.dark-theme .border-left,
+body.dark-theme .border-right {
+    border-color: #2a2f3e !important;
+}
+
+/* إصلاح hr */
+body.dark-theme hr {
+    border-color: #2a2f3e !important;
+    opacity: 1 !important;
+}
+
+/* التأكد من أن جميع النصوص مرئية */
+body.dark-theme [class*="text-"] {
+    opacity: 1 !important;
+}
+
+/* إصلاح ألوان النصوص الخاصة بـ Bootstrap */
+body.dark-theme .text-success {
+    color: #10b981 !important; /* أخضر فاتح */
+}
+
+body.dark-theme .text-danger {
+    color: #ef4444 !important; /* أحمر فاتح */
+}
+
+body.dark-theme .text-warning {
+    color: #f59e0b !important; /* برتقالي فاتح */
+}
+
+body.dark-theme .text-info {
+    color: #3b82f6 !important; /* أزرق فاتح */
+}
+
+body.dark-theme .text-primary {
+    color: #e85d75 !important; /* لون رئيسي فاتح مشتق من #c4123f */
+}
+
+/* إصلاح أيقونات البحث */
+body.dark-theme .fa-search,
+body.dark-theme .fas.fa-search {
+    color: #9ca3af !important;
+}
+
+body.dark-theme .btn .fa-search {
+    color: inherit !important;
+}
+
+/* إصلاح أزرار outline-primary */
+body.dark-theme .btn-outline-primary {
+    color: #e85d75 !important;
+    border-color: #e85d75 !important;
+    background-color: transparent;
+}
+
+body.dark-theme .btn-outline-primary:hover {
+    color: #ffffff !important;
+    background-color: #c4123f !important;
+    border-color: #c4123f !important;
+}
+
+body.dark-theme .btn-outline-primary.active {
+    color: #ffffff !important;
+    background-color: #c4123f !important;
+    border-color: #c4123f !important;
+}
+
+/* إصلاح date-header-row */
+body.dark-theme .date-header-row {
+    background-color: #0a0d15 !important;
+}
+
+body.dark-theme .date-header-row td {
+    background-color: #0a0d15 !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    border-color: #1a1f2e !important;
+}
+
+body.dark-theme .date-header-row td.table-secondary {
+    background-color: #0a0d15 !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme tr.date-header-row {
+    background-color: #0a0d15 !important;
+}
+
+body.dark-theme tr.date-header-row td {
+    background-color: #0a0d15 !important;
+    color: #ffffff !important;
+}
+
+/* إصلاح info-card */
+body.dark-theme .info-card {
+    background-color: #1a1f2e !important;
+    border-color: #2a2f3e !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-theme .info-card.border-success {
+    border-color: #10b981 !important;
+    border-width: 2px !important;
+}
+
+body.dark-theme .info-card.border-danger {
+    border-color: #ef4444 !important;
+    border-width: 2px !important;
+}
+
+body.dark-theme .info-card.border-warning {
+    border-color: #f59e0b !important;
+    border-width: 2px !important;
+}
+
+body.dark-theme .info-card.border-info {
+    border-color: #3b82f6 !important;
+    border-width: 2px !important;
+}
+
+/* إصلاح stats-container */
+body.dark-theme .stats-container {
+    background-color: transparent !important;
+}
+
+body.dark-theme .stats-container .stat-card {
+    background-color: #1a1f2e !important;
+    border: 1px solid #2a2f3e !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-theme .stats-container .stat-card h3 {
+    color: #ffffff !important;
+}
+
+body.dark-theme .stats-container .stat-card p {
+    color: #9ca3af !important;
+}
+
+/* إصلاح stat-box */
+body.dark-theme .stat-box {
+    background-color: #1a1f2e !important;
+    border: 1px solid #3a3f4e !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-theme .stat-box .stat-title {
+    color: #b0b0b0 !important;
+    font-weight: 500 !important;
+}
+
+body.dark-theme .stat-box .stat-value {
+    color: #ffffff !important;
+    font-weight: bold !important;
+}
+
+body.dark-theme .stat-box .stat-value.currency {
+    color: #10b981 !important;
+}
+
+/* إصلاح العملة */
+body.dark-theme .currency {
+    color: inherit !important;
+}
+
+/* إصلاح checkboxes في المظهر الداكن */
+body.dark-theme .form-check-input {
+    background-color: #2a2f3e !important;
+    border-color: #4a5568 !important;
+}
+
+body.dark-theme .form-check-input:checked {
+    background-color: #c4123f !important;
+    border-color: #c4123f !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e") !important;
+}
+
+body.dark-theme .form-check-input:focus {
+    border-color: #e85d75 !important;
+    box-shadow: 0 0 0 0.25rem rgba(228, 93, 117, 0.25) !important;
+}
+
+body.dark-theme .form-check-input:disabled {
+    background-color: #1a1f2e !important;
+    opacity: 0.5 !important;
+}
+
+/* إصلاح radio buttons */
+body.dark-theme .form-check-input[type="radio"] {
+    background-color: #2a2f3e !important;
+    border-color: #4a5568 !important;
+}
+
+body.dark-theme .form-check-input[type="radio"]:checked {
+    background-color: #c4123f !important;
+    border-color: #c4123f !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23fff'/%3e%3c/svg%3e") !important;
+}
+
+/* إصلاح switches */
+body.dark-theme .form-switch .form-check-input {
+    background-color: #4a5568 !important;
+    border-color: #4a5568 !important;
+}
+
+body.dark-theme .form-switch .form-check-input:checked {
+    background-color: #c4123f !important;
+    border-color: #c4123f !important;
+}
+
+body.dark-theme .form-switch .form-check-input:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%234a5568'/%3e%3c/svg%3e") !important;
+}
+
+body.dark-theme .form-switch .form-check-input:checked:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23c4123f'/%3e%3c/svg%3e") !important;
+}
+
+/* إصلاح أي عنصر قد يكون شفاف */
+body.dark-theme * {
+    opacity: 1 !important;
+}
+
+/* إصلاح footer في المظهر الداكن */
+body.dark-theme .site-footer {
+    background-color: var(--primary-color) !important;
+    color: var(--primary-color-text, #ffffff) !important;
+}
+
+body.dark-theme .site-footer * {
+    color: inherit !important;
+}
+
+body.dark-theme .site-footer a {
+    color: var(--primary-color-text, #ffffff) !important;
+    opacity: 0.8;
+}
+
+body.dark-theme .site-footer a:hover {
+    opacity: 1;
+}
+
+body.dark-theme .site-footer small {
+    color: var(--primary-color-text, #ffffff) !important;
+    opacity: 0.7;
+}
+
+/* إصلاح عندما يكون col-md-4 بلون فاتح */
+body.dark-theme .col-md-4[style*="background"],
+body.dark-theme .col-md-4[style*="background-color"] {
+    color: #000000 !important;
+}
+
+body.dark-theme .col-md-4[style*="background: #fff"],
+body.dark-theme .col-md-4[style*="background-color: #fff"],
+body.dark-theme .col-md-4[style*="background: white"],
+body.dark-theme .col-md-4[style*="background-color: white"] {
+    color: #000000 !important;
+}
+
+body.dark-theme .col-md-4[style*="background"] *,
+body.dark-theme .col-md-4[style*="background-color"] * {
+    color: inherit !important;
+}
+
+/* إصلاح expense-type-chip */
+body.dark-theme .expense-type-chip {
+    background-color: #2a2f3e !important;
+    color: #f0f0f0 !important;
+    border-color: #3a3f4e !important;
+}
+
+body.dark-theme .expense-type-chip:hover {
+    background-color: #3a3f4e !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .expense-type-chip.active {
+    background-color: #c4123f !important;
+    color: #ffffff !important;
+    border-color: #c4123f !important;
+}
+
+/* إصلاح btn-info */
+body.dark-theme .btn-info {
+    background-color: #0891b2 !important;
+    border-color: #0891b2 !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-info:hover {
+    background-color: #0e7490 !important;
+    border-color: #0e7490 !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-info:focus,
+body.dark-theme .btn-info:active {
+    background-color: #0e7490 !important;
+    border-color: #0e7490 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(8, 145, 178, 0.5) !important;
+}
+
+/* إصلاح btn-warning */
+body.dark-theme .btn-warning {
+    background-color: #d97706 !important;
+    border-color: #d97706 !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-warning:hover {
+    background-color: #b45309 !important;
+    border-color: #b45309 !important;
+    color: #ffffff !important;
+}
+
+body.dark-theme .btn-warning:focus,
+body.dark-theme .btn-warning:active {
+    background-color: #b45309 !important;
+    border-color: #b45309 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(217, 119, 6, 0.5) !important;
+}
+
+/* إصلاح filter-summary */
+body.dark-theme .filter-summary {
+    background-color: #1a1f2e !important;
+    border: 1px solid #2a2f3e !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-theme .filter-summary-stat {
+    background-color: #2a2f3e !important;
+    color: #f0f0f0 !important;
+    border: 1px solid #3a3f4e !important;
+}
+
+body.dark-theme .filter-summary-stat h6 {
+    color: #ffffff !important;
+}
+
+body.dark-theme .filter-summary-stat p {
+    color: #d0d0d0 !important;
+}
+
+/* إصلاح خاص للعناصر المحددة */
+body.dark-theme .date-header-row {
+    background-color: #0f141f !important;
+}
+
+body.dark-theme .date-header-row * {
+    color: #ffffff !important;
+    font-weight: bold !important;
+}
+
+/* إصلاحات إضافية للأزرار والعناصر */
+body.dark-theme .btn-outline-info {
+    color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    background-color: transparent !important;
+}
+
+body.dark-theme .btn-outline-info:hover {
+    color: #ffffff !important;
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
+body.dark-theme .btn-outline-warning {
+    color: #f59e0b !important;
+    border-color: #f59e0b !important;
+    background-color: transparent !important;
+}
+
+body.dark-theme .btn-outline-warning:hover {
+    color: #ffffff !important;
+    background-color: #f59e0b !important;
+    border-color: #f59e0b !important;
+}
+
+/* التأكد من وضوح النصوص في جميع العناصر */
+body.dark-theme .expense-type-chip *,
+body.dark-theme .filter-summary *,
+body.dark-theme .filter-summary-stat * {
+    color: inherit !important;
+}
+
+body.dark-theme #storeSearchInput {
+    background-color: #1a1f2e !important;
+    color: #f0f0f0 !important;
+    border-color: #3a3f4e !important;
+}
+
+body.dark-theme .table-responsive {
+    background-color: transparent !important;
+}
+
+body.dark-theme .data-table * {
+    color: #f0f0f0 !important;
+}
+
+body.dark-theme .export-btn {
+    background-color: #252a3a !important;
+    color: #f0f0f0 !important;
+    border-color: #3a3f4e !important;
+}
+
+body.dark-theme .export-btn:hover {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+}

@@ -1,0 +1,22 @@
+{
+  "name": "نظام بيع الكروت والمصروفات",
+  "short_name": "نظام الكروت",
+  "description": "تطبيق شامل لإدارة مبيعات كروت الشبكات والمصروفات.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#575657",
+  "theme_color": "#575657",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "./icons/icon-16.png",   "type": "image/png", "sizes": "16x16",   "purpose": "any" },
+    { "src": "./icons/icon-32.png",   "type": "image/png", "sizes": "32x32",   "purpose": "any" },
+    { "src": "./icons/icon-64.png",   "type": "image/png", "sizes": "64x64",   "purpose": "any" },
+    { "src": "./icons/icon-128.png",  "type": "image/png", "sizes": "128x128", "purpose": "any" },
+    { "src": "./icons/icon-180.png",  "type": "image/png", "sizes": "180x180", "purpose": "any" },
+    { "src": "./icons/icon-192.png",  "type": "image/png", "sizes": "192x192", "purpose": "any maskable" },
+    { "src": "./icons/icon-256.png",  "type": "image/png", "sizes": "256x256", "purpose": "any" },
+    { "src": "./icons/icon-384.png",  "type": "image/png", "sizes": "384x384", "purpose": "any" },
+    { "src": "./icons/icon-512.png",  "type": "image/png", "sizes": "512x512", "purpose": "any maskable" }
+  ]
+}
