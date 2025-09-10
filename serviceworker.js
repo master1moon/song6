@@ -12,7 +12,7 @@
  * - لا يعطي تحديثات للمستخدم عن حالة الاتصال
  */
 
-const CACHE_NAME = 'network-cards-cache-v1.7';
+const CACHE_NAME = 'network-cards-cache-v1.8';
 
 /**
  * قائمة الموارد الحرجة المطلوبة لعمل التطبيق
@@ -26,6 +26,11 @@ const CRITICAL_ASSETS = [
   './manifest.json',
   // './fonts/Amiri-Regular.woff2', // معطل مؤقتاً لكونه غير صالح
   './app.js',
+  './js/smartCache.js',
+  './js/settings.js',
+  './js/settingsUI.js',
+  './js/soundSystem.js',
+  './js/cloudStorageHelper.js',
   './js/security.js',
   './js/encryption.js',
   './js/safeDOM.js',
@@ -41,7 +46,10 @@ const CRITICAL_ASSETS = [
   './js/storage.js',
   './js/backup.js',
   './js/backupManager.js',
+  './js/storeFilter.js',
+  './js/expensesTypes.js',
   './js/trash.js',
+  './js/parityCheck.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png'
