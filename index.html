@@ -5965,6 +5965,16 @@
             });
         }catch(_){}
     });
+    
+    document.addEventListener('DOMContentLoaded', function(){
+        try{
+            var btn = document.getElementById('addExpenseBtn');
+            if (btn && !btn.dataset._wired) {
+                btn.addEventListener('click', function(){ if (typeof addExpense === 'function') addExpense(); });
+                btn.dataset._wired = '1';
+            }
+        }catch(_){}
+    });
     </script>
 
 
