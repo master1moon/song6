@@ -632,6 +632,23 @@ function showStoreDetails(storeId) {
   });
   document.getElementById('addSaleBtn').addEventListener('click', () => addSale(storeId));
   document.getElementById('addPaymentBtn').addEventListener('click', () => addPayment(storeId));
+
+  // ربط أزرار التصدير إذا وُجدت
+  try {
+    document.querySelectorAll('#storeDetails .export-btn').forEach(btn => {
+      if (btn.dataset._wired) return;
+      btn.addEventListener('click', function(){
+        const fmt = this.getAttribute('data-format');
+        const sid = this.getAttribute('data-store') || storeId;
+        if (typeof exportStoreData === 'function') {
+          exportStoreData(sid, fmt);
+        } else if (typeof showNotification === 'function') {
+          showNotification('وظيفة التصدير غير متاحة حالياً', 'error');
+        }
+      });
+      btn.dataset._wired = '1';
+    });
+  } catch(_) {}
   
   // معالجات أزرار التعديل والحذف في العنوان
   headerEl.querySelector('.edit-store').addEventListener('click', () => editStore(storeId));
