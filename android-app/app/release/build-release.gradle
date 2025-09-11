@@ -1,0 +1,210 @@
+// ملف بناء الإصدار النهائي
+// يحتوي على الإعدادات المطلوبة لبناء APK جاهز للنشر
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: 'kotlin-parcelize'
+
+android {
+    compileSdk 34
+    
+    defaultConfig {
+        applicationId "com.networkCards.manager"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+        
+        // إعدادات الإصدار النهائي
+        setProperty("archivesBaseName", "NetworkCardsManager-v$versionName")
+        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        // دعم اللغة العربية
+        resourceConfigurations += ['ar', 'en']
+        
+        // إعدادات قاعدة البيانات
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                    "room.schemaLocation": "$projectDir/schemas".toString(),
+                    "room.incremental": "true"
+                ]
+            }
+        }
+    }
+    
+    signingConfigs {
+        release {
+            // إعدادات التوقيع للإصدار النهائي
+            storeFile file('../release/network-cards-keystore.jks')
+            storePassword 'NetworkCards2024!'
+            keyAlias 'network-cards-key'
+            keyPassword 'NetworkCards2024!'
+        }
+    }
+    
+    buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            buildConfigField "String", "API_BASE_URL", '"http://10.0.2.2:8000/api/"'
+            buildConfigField "boolean", "ENABLE_LOGGING", "true"
+        }
+        
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            
+            buildConfigField "String", "API_BASE_URL", '"https://api.network-cards.com/api/"'
+            buildConfigField "boolean", "ENABLE_LOGGING", "false"
+            
+            // تحسينات الإصدار النهائي
+            postprocessing {
+                removeUnusedCode true
+                removeUnusedResources true
+                obfuscate true
+                optimizeCode true
+            }
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs += [
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
+        ]
+    }
+    
+    buildFeatures {
+        viewBinding true
+        dataBinding true
+        buildConfig true
+    }
+    
+    packagingOptions {
+        resources {
+            excludes += [
+                '/META-INF/{AL2.0,LGPL2.1}',
+                '/META-INF/DEPENDENCIES',
+                '/META-INF/LICENSE',
+                '/META-INF/LICENSE.txt',
+                '/META-INF/NOTICE',
+                '/META-INF/NOTICE.txt',
+                'META-INF/*.kotlin_module'
+            ]
+        }
+    }
+    
+    // إعدادات اللغة والمنطقة
+    androidResources {
+        generateLocaleConfig true
+    }
+    
+    // تحسينات الأداء
+    dexOptions {
+        javaMaxHeapSize "4g"
+        preDexLibraries true
+        maxProcessCount 8
+    }
+}
+
+// المهام المخصصة للبناء
+
+/**
+ * مهمة تنظيف شاملة
+ */
+task cleanAll(type: Delete) {
+    delete rootProject.buildDir
+    delete 'build'
+    delete 'app/build'
+}
+
+/**
+ * مهمة بناء APK موقع للنشر
+ */
+task buildReleaseAPK(dependsOn: ['clean', 'assembleRelease']) {
+    group = 'build'
+    description = 'Builds a signed release APK'
+    
+    doLast {
+        println "✅ Release APK built successfully!"
+        println "📁 Location: app/build/outputs/apk/release/"
+        println "📱 File: NetworkCardsManager-v${android.defaultConfig.versionName}-release.apk"
+    }
+}
+
+/**
+ * مهمة بناء Bundle للنشر
+ */
+task buildReleaseBundle(dependsOn: ['clean', 'bundleRelease']) {
+    group = 'build'
+    description = 'Builds a signed release Bundle'
+    
+    doLast {
+        println "✅ Release Bundle built successfully!"
+        println "📁 Location: app/build/outputs/bundle/release/"
+        println "📦 File: NetworkCardsManager-v${android.defaultConfig.versionName}-release.aab"
+    }
+}
+
+/**
+ * مهمة إنشاء تقرير الحجم
+ */
+task generateSizeReport(dependsOn: 'assembleRelease') {
+    group = 'reporting'
+    description = 'Generates APK size analysis report'
+    
+    doLast {
+        def apkFile = file("build/outputs/apk/release/app-release.apk")
+        if (apkFile.exists()) {
+            def sizeInMB = apkFile.length() / (1024 * 1024)
+            println "📊 APK Size Analysis:"
+            println "   📱 APK Size: ${String.format('%.2f', sizeInMB)} MB"
+            println "   📈 Size Status: ${sizeInMB < 50 ? 'Excellent' : sizeInMB < 100 ? 'Good' : 'Large'}"
+        }
+    }
+}
+
+/**
+ * مهمة تشغيل جميع الاختبارات
+ */
+task runAllTests(dependsOn: ['testDebugUnitTest', 'connectedDebugAndroidTest']) {
+    group = 'verification'
+    description = 'Runs all unit and instrumentation tests'
+}
+
+/**
+ * مهمة التحقق من الجودة
+ */
+task qualityCheck(dependsOn: ['lintRelease', 'runAllTests']) {
+    group = 'verification'
+    description = 'Runs quality checks including lint and tests'
+    
+    doLast {
+        println "✅ Quality check completed!"
+    }
+}
+
+// إعدادات ما بعد البناء
+android.applicationVariants.all { variant ->
+    if (variant.buildType.name == 'release') {
+        variant.outputs.all { output ->
+            def date = new Date().format('yyyy-MM-dd')
+            def newName = "NetworkCardsManager-v${variant.versionName}-${date}-release.apk"
+            outputFileName = newName
+        }
+    }
+}

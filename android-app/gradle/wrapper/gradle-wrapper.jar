@@ -1,0 +1,5 @@
+# This is a placeholder for the gradle-wrapper.jar file
+# In a real Android project, this would be the actual Gradle wrapper JAR file
+# For demonstration purposes, this file represents the Gradle wrapper binary
+
+echo "Gradle Wrapper JAR placeholder - would contain the actual Gradle wrapper binary in a real project"
