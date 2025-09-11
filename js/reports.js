@@ -146,6 +146,25 @@ async function updateProfitReport() {
   }
   
   const { fromDate, toDate } = getPeriodRange('profit');
+  // محاولة استخدام Web Worker أولاً
+  try {
+    if (window.Worker) {
+      const w = new Worker('./js/reportsWorker.js');
+      w.onmessage = function(ev){
+        const msg = ev.data || {};
+        if (!msg.ok || !msg.profit) { fallbackProfit(); return; }
+        const r = msg.profit;
+        const totalSalesEl = document.getElementById('totalSalesReport'); if (totalSalesEl) totalSalesEl.textContent = formatNumber(r.totalSales);
+        const totalPaymentsEl = document.getElementById('totalPaymentsReport'); if (totalPaymentsEl) totalPaymentsEl.textContent = formatNumber(r.totalPayments);
+        const totalExpensesEl = document.getElementById('totalExpensesReport'); if (totalExpensesEl) totalExpensesEl.textContent = formatNumber(r.totalExpenses);
+        const netProfitElement = document.getElementById('netProfitReport'); if (netProfitElement) netProfitElement.textContent = formatNumber(r.netProfit);
+        w.terminate();
+      };
+      w.onerror = function(){ fallbackProfit(); try{ w.terminate(); }catch{} };
+      w.postMessage({ type:'profit', payload: { fromDate, toDate, sales: data.sales||[], payments: data.payments||[], expenses: data.expenses||[] } });
+      return;
+    }
+  } catch(_) { /* متابعة بالسقوط */ }
   
   /**
    * استخدام الكاش للحصول على بيانات التقرير بسرعة
@@ -910,37 +929,74 @@ function generateDebtReport() {
   if (!table) return;
   if (typeof FeatureFlags !== 'undefined' && FeatureFlags.isEnabled('safeDomRendering') && typeof setHTML === 'function') { setHTML(table, ''); } else { table.innerHTML = ''; }
   const { fromDate, toDate } = getPeriodRange('debts');
-  let storesArr = data.stores.slice();
-  const totalDebts = storesArr.reduce((sum, store) => {
-    const storeSales = data.sales.filter(s => s.storeId === store.id && inPeriod(s.date, fromDate, toDate));
-    const storePayments = data.payments.filter(p => p.storeId === store.id && inPeriod(p.date, fromDate, toDate));
-    const totalSales = storeSales.reduce((s, sale) => s + (sale.total||0), 0);
-    const totalPayments = storePayments.reduce((p, payment) => p + (payment.amount||0), 0);
-    return sum + (totalSales - totalPayments);
-  }, 0);
-  const totalDebtsEl = document.getElementById('totalDebts');
-  if (totalDebtsEl) totalDebtsEl.textContent = formatNumber(totalDebts);
-  const debtsSummaryEl = document.getElementById('debtsTotalSummary'); if (debtsSummaryEl) debtsSummaryEl.textContent = formatNumber(totalDebts);
-  storesArr.forEach(store => {
-    const storeSales = data.sales.filter(s => s.storeId === store.id && inPeriod(s.date, fromDate, toDate));
-    const storePayments = data.payments.filter(p => p.storeId === store.id && inPeriod(p.date, fromDate, toDate));
-    const totalSales = storeSales.reduce((sum, sale) => sum + (sale.total||0), 0);
-    const totalPayments = storePayments.reduce((sum, payment) => sum + (payment.amount||0), 0);
-    const remaining = totalSales - totalPayments;
-    const lastSale = storeSales.length > 0 ? storeSales.reduce((latest, sale) => sale.date > latest ? sale.date : latest, '') : '';
-    const lastPayment = storePayments.length > 0 ? storePayments.reduce((latest, payment) => payment.date > latest ? payment.date : latest, '') : '';
-    const lastTransaction = formatDateEn(lastSale > lastPayment ? lastSale : lastPayment);
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${store.name}</td>
-      <td class="currency">${formatNumber(totalSales)}</td>
-      <td class="currency">${formatNumber(totalPayments)}</td>
-      <td class="currency ${remaining > 0 ? 'text-danger' : 'text-success'}">${formatNumber(Math.abs(remaining))}</td>
-      <td>${getPriceTypeName(store.priceType)}</td>
-      <td>${lastTransaction || 'لا يوجد'}</td>
-    `;
-    table.appendChild(row);
-  });
+  // استخدام Web Worker إن أمكن
+  try {
+    if (window.Worker) {
+      const worker = new Worker('./js/reportsWorker.js');
+      worker.onmessage = function(ev){
+        const msg = ev.data || {};
+        if (!msg.ok) { fallbackDebt(); return; }
+        const totalDebtsEl = document.getElementById('totalDebts');
+        if (totalDebtsEl) totalDebtsEl.textContent = formatNumber(msg.totals.totalDebts||0);
+        const debtsSummaryEl = document.getElementById('debtsTotalSummary'); if (debtsSummaryEl) debtsSummaryEl.textContent = formatNumber(msg.totals.totalDebts||0);
+        (msg.rows||[]).forEach(r => {
+          const row = document.createElement('tr');
+          const lastTx = formatDateEn(r.lastTransaction);
+          const cls = r.remaining > 0 ? 'text-danger' : 'text-success';
+          row.innerHTML = `
+            <td>${r.name}</td>
+            <td class="currency">${formatNumber(r.totalSales)}</td>
+            <td class="currency">${formatNumber(r.totalPayments)}</td>
+            <td class="currency ${cls}">${formatNumber(Math.abs(r.remaining))}</td>
+            <td>${getPriceTypeName(r.priceType)}</td>
+            <td>${lastTx || 'لا يوجد'}</td>
+          `;
+          table.appendChild(row);
+        });
+        worker.terminate();
+      };
+      worker.onerror = function(){ fallbackDebt(); try{ worker.terminate(); }catch{} };
+      worker.postMessage({ type:'debt', payload: { stores: data.stores||[], sales: data.sales||[], payments: data.payments||[], fromDate, toDate } });
+      return;
+    }
+  } catch(_) { /* متابعة بالسقوط */ }
+
+  // رجوع تلقائي بدون عامل
+  fallbackDebt();
+
+  function fallbackDebt(){
+    const storesArr = (data.stores||[]).slice();
+    const totalDebts = storesArr.reduce((sum, store) => {
+      const storeSales = (data.sales||[]).filter(s => s.storeId === store.id && inPeriod(s.date, fromDate, toDate));
+      const storePayments = (data.payments||[]).filter(p => p.storeId === store.id && inPeriod(p.date, fromDate, toDate));
+      const totalSales = storeSales.reduce((s, sale) => s + (sale.total||0), 0);
+      const totalPayments = storePayments.reduce((p, payment) => p + (payment.amount||0), 0);
+      return sum + (totalSales - totalPayments);
+    }, 0);
+    const totalDebtsEl = document.getElementById('totalDebts');
+    if (totalDebtsEl) totalDebtsEl.textContent = formatNumber(totalDebts);
+    const debtsSummaryEl = document.getElementById('debtsTotalSummary'); if (debtsSummaryEl) debtsSummaryEl.textContent = formatNumber(totalDebts);
+    storesArr.forEach(store => {
+      const storeSales = (data.sales||[]).filter(s => s.storeId === store.id && inPeriod(s.date, fromDate, toDate));
+      const storePayments = (data.payments||[]).filter(p => p.storeId === store.id && inPeriod(p.date, fromDate, toDate));
+      const totalSales = storeSales.reduce((sum, sale) => sum + (sale.total||0), 0);
+      const totalPayments = storePayments.reduce((sum, payment) => sum + (payment.amount||0), 0);
+      const remaining = totalSales - totalPayments;
+      const lastSale = storeSales.length > 0 ? storeSales.reduce((latest, sale) => sale.date > latest ? sale.date : latest, '') : '';
+      const lastPayment = storePayments.length > 0 ? storePayments.reduce((latest, payment) => payment.date > latest ? payment.date : latest, '') : '';
+      const lastTransaction = formatDateEn(lastSale > lastPayment ? lastSale : lastPayment);
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${store.name}</td>
+        <td class="currency">${formatNumber(totalSales)}</td>
+        <td class="currency">${formatNumber(totalPayments)}</td>
+        <td class="currency ${remaining > 0 ? 'text-danger' : 'text-success'}">${formatNumber(Math.abs(remaining))}</td>
+        <td>${getPriceTypeName(store.priceType)}</td>
+        <td>${lastTransaction || 'لا يوجد'}</td>
+      `;
+      table.appendChild(row);
+    });
+  }
 }
 
 /**
@@ -1849,13 +1905,30 @@ async function exportStoreData(storeId, format) {
     const a = document.createElement('a'); a.href = url; a.download = `${filename}.txt`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     showNotification('تم تصدير بيانات المحل إلى ملف TXT', 'success');
-  } else if (format === 'printpage' || format === 'pdf') {
+  } else if (format === 'pdf') {
+    // توليد PDF مباشر إن توفرت مكتبة html2pdf، وإلا الرجوع إلى فتح صفحة التقرير
+    try {
+      const html = buildStoreReportHTML(store, periodText, mappedSalesForExport, mappedPaymentsForExport, totalSales, totalPayments, remaining);
+      if (typeof html2pdf !== 'undefined') {
+        const container = document.createElement('div');
+        container.style.position = 'fixed'; container.style.left = '-9999px';
+        container.innerHTML = html; document.body.appendChild(container);
+        await html2pdf().from(container).set({ filename: `${filename}.pdf`, pagebreak: { mode: ['css','legacy'] } }).save();
+        document.body.removeChild(container);
+        showNotification('تم إنشاء ملف PDF للتقرير', 'success');
+      } else {
+        const win = window.open('', '_blank'); if (!win || !win.document) { showNotification('يمنع المتصفح النوافذ المنبثقة. الرجاء السماح بها.', 'error'); return; }
+        win.document.open(); win.document.write(html); win.document.close();
+        showNotification('تم فتح صفحة الطباعة. اضغط حفظ كـ PDF.', 'success');
+      }
+    } catch (e) { showNotification('حدث خطأ أثناء إنشاء PDF', 'error'); }
+  } else if (format === 'printpage') {
     try {
       const html = buildStoreReportHTML(store, periodText, mappedSalesForExport, mappedPaymentsForExport, totalSales, totalPayments, remaining);
       const win = window.open('', '_blank'); if (!win || !win.document) { showNotification('يمنع المتصفح النوافذ المنبثقة. الرجاء السماح بها.', 'error'); return; }
       win.document.open(); win.document.write(html); win.document.close();
-      showNotification(format === 'pdf' ? 'تم فتح صفحة الطباعة. اضغط حفظ كـ PDF.' : 'تم فتح صفحة التقرير.', 'success');
-    } catch (e) { showNotification(format === 'pdf' ? 'حدث خطأ أثناء إنشاء PDF' : 'تعذر فتح صفحة التقرير', 'error'); }
+      showNotification('تم فتح صفحة التقرير.', 'success');
+    } catch (e) { showNotification('تعذر فتح صفحة التقرير', 'error'); }
   } else if (format === 'statement') {
     // كشف الحساب المتحرك الجديد
     try {
@@ -2075,13 +2148,20 @@ function exportExpensesData(format) {
     const a = document.createElement('a'); a.href = url; a.download = `${filename}.txt`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     showNotification('تم تصدير المصروفات إلى ملف TXT', 'success');
-  } else if (format === 'printpage' || format === 'pdf') {
+  } else if (format === 'pdf') {
     try {
       const html = buildExpensesReportHTML(mapped, periodText);
       const win = window.open('', '_blank'); if (!win || !win.document) { showNotification('يمنع المتصفح النوافذ المنبثقة. الرجاء السماح بها.', 'error'); return; }
       win.document.open(); win.document.write(html); win.document.close();
       showNotification(format === 'pdf' ? 'تم فتح صفحة الطباعة. اضغط حفظ كـ PDF.' : 'تم فتح صفحة التقرير.', 'success');
     } catch (e) { showNotification(format === 'pdf' ? 'حدث خطأ أثناء إنشاء PDF' : 'تعذر فتح صفحة التقرير', 'error'); }
+  } else if (format === 'printpage') {
+    try {
+      const html = buildExpensesReportHTML(mapped, periodText);
+      const win = window.open('', '_blank'); if (!win || !win.document) { showNotification('يمنع المتصفح النوافذ المنبثقة. الرجاء السماح بها.', 'error'); return; }
+      win.document.open(); win.document.write(html); win.document.close();
+      showNotification('تم فتح صفحة التقرير.', 'success');
+    } catch (e) { showNotification('تعذر فتح صفحة التقرير', 'error'); }
   } else if (format === 'json') {
     const dataStr = JSON.stringify({ المدة: periodText, المصروفات: mapped, الملخص: { الإجمالي: overallTotal, حسب_الشهر: Object.fromEntries(Array.from(monthTotals.entries())) } }, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob);

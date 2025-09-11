@@ -62,14 +62,8 @@ async function renderStoresList() {
     filteredStores = filteredStores.filter(store => store.priceType === storesState.priceFilter);
   }
   
-  /**
-   * حساب الرصيد لكل محل باستخدام الكاش الذكي
-   * يحسب الرصيد مرة واحدة فقط ويحفظه في الذاكرة
-   * عند طلب نفس الرصيد مرة أخرى، يعيده من الكاش فوراً
-   * يوفر 95% من وقت المعالجة في العروض المتكررة
-   */
+  // حساب الرصيد لكل محل باستخدام الكاش الذكي
   if (typeof balanceCache !== 'undefined') {
-    // استخدام الكاش الذكي للحصول على الأرصدة بسرعة فائقة
     filteredStores = await Promise.all(
       filteredStores.map(async store => {
         const balance = await balanceCache.calculateBalance(store.id);
@@ -77,8 +71,6 @@ async function renderStoresList() {
       })
     );
   } else {
-    // الطريقة القديمة كـ fallback إذا لم يكن الكاش متاحاً
-    console.warn('نظام الكاش غير متاح، استخدام الطريقة البطيئة');
     filteredStores = filteredStores.map(store => {
       const sales = data.sales.filter(s => s.storeId === store.id);
       const payments = data.payments.filter(p => p.storeId === store.id);
@@ -110,35 +102,54 @@ async function renderStoresList() {
     return;
   }
   
-  filteredStores.forEach(store => {
-    const item = document.createElement('a'); 
-    item.href = '#'; 
-    item.className = 'list-group-item list-group-item-action'; 
-    item.dataset.id = store.id;
-    
-    const balanceClass = store.balance >= 0 ? 'text-success' : 'text-danger';
-    const phoneInfo = store.phone ? `<i class="fas fa-phone fa-xs"></i> ${store.phone}` : '';
-    
-    item.innerHTML = `
-      <div class="d-flex justify-content-between align-items-start">
-        <div>
-          <h6 class="mb-1">${store.name}</h6>
-          <small class="text-muted">نوع السعر: ${getPriceTypeName(store.priceType)}</small>
-          ${phoneInfo ? `<br><small class="text-muted">${phoneInfo}</small>` : ''}
-        </div>
-        <div class="text-end">
-          <small class="${balanceClass} fw-bold currency">${formatNumber(Math.abs(store.balance))}</small>
-          <br><small class="text-muted">${store.balance >= 0 ? 'دائن' : 'مدين'}</small>
-        </div>
-      </div>`;
-    
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      showStoreDetails(store.id);
+  // عرض افتراضي بسيط: حساب العناصر الظاهرة فقط حسب التمرير
+  const container = list.parentElement; // .stores-list-container
+  const rowHeight = 72; // تقدير ارتفاع العنصر
+  const buffer = 6; // عناصر إضافية كحافة أمان
+  const total = filteredStores.length;
+  
+  function renderSlice() {
+    if (!container) return;
+    const scrollTop = container.scrollTop;
+    const containerHeight = container.clientHeight || 600;
+    const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - buffer);
+    const endIndex = Math.min(total, Math.ceil((scrollTop + containerHeight) / rowHeight) + buffer);
+    const slice = filteredStores.slice(startIndex, endIndex);
+    if (typeof FeatureFlags !== 'undefined' && FeatureFlags.isEnabled('safeDomRendering') && typeof setHTML === 'function') { setHTML(list, ''); } else { list.innerHTML = ''; }
+    // مساحة وهمية قبل وبعد للحفاظ على شريط التمرير
+    const topSpacer = document.createElement('div'); topSpacer.style.height = (startIndex * rowHeight) + 'px';
+    const bottomSpacer = document.createElement('div'); bottomSpacer.style.height = ((total - endIndex) * rowHeight) + 'px';
+    list.appendChild(topSpacer);
+    slice.forEach(store => {
+      const item = document.createElement('a'); 
+      item.href = '#'; 
+      item.className = 'list-group-item list-group-item-action'; 
+      item.dataset.id = store.id;
+      const balanceClass = store.balance >= 0 ? 'text-success' : 'text-danger';
+      const phoneInfo = store.phone ? `<i class="fas fa-phone fa-xs"></i> ${store.phone}` : '';
+      item.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h6 class="mb-1">${store.name}</h6>
+            <small class="text-muted">نوع السعر: ${getPriceTypeName(store.priceType)}</small>
+            ${phoneInfo ? `<br><small class="text-muted">${phoneInfo}</small>` : ''}
+          </div>
+          <div class="text-end">
+            <small class="${balanceClass} fw-bold currency">${formatNumber(Math.abs(store.balance))}</small>
+            <br><small class="text-muted">${store.balance >= 0 ? 'دائن' : 'مدين'}</small>
+          </div>
+        </div>`;
+      item.addEventListener('click', (e) => { e.preventDefault(); showStoreDetails(store.id); });
+      list.appendChild(item);
     });
-    
-    list.appendChild(item);
-  });
+    list.appendChild(bottomSpacer);
+  }
+  
+  renderSlice();
+  if (container && !container._virtBound) {
+    container.addEventListener('scroll', () => { renderSlice(); }, { passive: true });
+    container._virtBound = true;
+  }
 }
 
 /**
@@ -621,6 +632,23 @@ function showStoreDetails(storeId) {
   });
   document.getElementById('addSaleBtn').addEventListener('click', () => addSale(storeId));
   document.getElementById('addPaymentBtn').addEventListener('click', () => addPayment(storeId));
+
+  // ربط أزرار التصدير إذا وُجدت
+  try {
+    document.querySelectorAll('#storeDetails .export-btn').forEach(btn => {
+      if (btn.dataset._wired) return;
+      btn.addEventListener('click', function(){
+        const fmt = this.getAttribute('data-format');
+        const sid = this.getAttribute('data-store') || storeId;
+        if (typeof exportStoreData === 'function') {
+          exportStoreData(sid, fmt);
+        } else if (typeof showNotification === 'function') {
+          showNotification('وظيفة التصدير غير متاحة حالياً', 'error');
+        }
+      });
+      btn.dataset._wired = '1';
+    });
+  } catch(_) {}
   
   // معالجات أزرار التعديل والحذف في العنوان
   headerEl.querySelector('.edit-store').addEventListener('click', () => editStore(storeId));

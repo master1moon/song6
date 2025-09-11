@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <!-- CSP في وضع المراقبة فقط (لا يعطل الميزات الحالية) -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; connect-src 'self' https: data: blob:; font-src 'self' https: data:; frame-ancestors 'self'; report-to csp-endpoint; report-uri https://example.invalid/csp-report">
-    <meta http-equiv="Content-Security-Policy-Report-Only" content="default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; connect-src 'self' https: data: blob:; font-src 'self' https: data:; frame-ancestors 'self'; report-to csp-endpoint; report-uri https://example.invalid/csp-report">
+    <!-- تمت إزالة سياسات CSP عبر meta لأن المتصفحات تتجاهل frame-ancestors/report-uri هنا.
+         عند النشر على خادم، أضف ترويسات CSP من الخادم مباشرة. -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#575657">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,16 +18,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام إدارة كروت الشبكات اللاسلكية</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/dark-theme-fixes.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/ar.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="./libs/fontawesome/css/all.min.css">
+    <script src="./libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="./libs/xlsx/xlsx.full.min.js"></script>
+    <script src="./libs/moment/moment.min.js"></script>
+    <script src="./libs/moment/ar.min.js"></script>
+    <style>
+        .help-fab{position:fixed;bottom:20px;right:20px;z-index:1050}
+    </style>
+    <script src="./libs/jspdf/jspdf.umd.min.js"></script>
+    <script src="./libs/jspdf-autotable/jspdf.plugin.autotable.min.js"></script>
+    <script src="./libs/html2pdf/html2pdf.bundle.min.js"></script>
     
     <style>
         /* @font-face مؤقتاً معطل بسبب ملف خط غير صالح
@@ -646,7 +649,6 @@
         body.dark-theme .btn .far {
             color: inherit;
         }
-        
         /* إصلاح حدود وخلفيات إضافية */
         body.dark-theme .border {
             border-color: #3a3f4e !important;
@@ -1887,6 +1889,7 @@
             <img id="splashLogo" src="./icons/icon-128.png" alt="شعار التطبيق">
             <div id="splashTitle">نظام كروت الشبكات</div>
             <div id="splashRights"></div>
+            <button id="splashSkip" class="btn btn-sm btn-outline-light mt-3">تخطي</button>
         </div>
     </div>
     <!-- شريط علوي للجوال مع زر القائمة -->
@@ -1994,16 +1997,17 @@
 
             <!-- لوحة التحكم -->
             <div id="dashboard" class="section">
-                <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="d-flex align-items-center gap-2 mb-3" id="dashboardPeriodWrap">
                     <label for="dashboardPeriod" class="mb-0">مدة الحساب:</label>
                     <select id="dashboardPeriod" class="form-select form-select-sm" style="width:auto;">
-                        <option value="from_start" selected>من البداية</option>
+                        <option value="from_start">من البداية</option>
                         <option value="day">خلال يوم</option>
                         <option value="week">خلال اسبوع</option>
                         <option value="month">خلال شهر</option>
-                        <option value="this_month">خلال هذا الشهر</option>
+                        <option value="this_month" selected>خلال هذا الشهر</option>
                         <option value="prev_month">خلال الشهر السابق</option>
                     </select>
+                    <button type="button" id="applyDashboardPeriod" class="btn btn-sm btn-outline-primary">تطبيق</button>
                 </div>
                 <div class="stats-container">
                     <div class="stat-box">
@@ -2193,11 +2197,11 @@
                             <div class="col-12 col-md-auto d-flex align-items-center gap-2">
                                 <label for="expensesPeriod" class="mb-0">مدة العرض:</label>
                                 <select id="expensesPeriod" class="form-select form-select-sm" style="width:auto; min-width: 160px;">
-                                    <option value="from_start" selected>من البداية</option>
+                                    <option value="from_start">من البداية</option>
                                     <option value="day">خلال يوم</option>
                                     <option value="week">خلال اسبوع</option>
                                     <option value="month">خلال شهر</option>
-                                    <option value="this_month">خلال هذا الشهر</option>
+                                    <option value="this_month" selected>خلال هذا الشهر</option>
                                     <option value="prev_month">خلال الشهر السابق</option>
                                     <option value="custom">خلال مدة محددة</option>
                                 </select>
@@ -2855,7 +2859,6 @@
             </div>
         </div>
     </div>
-
     <!-- Modal لإضافة مصروف جديد -->
     <div class="modal fade" id="expenseModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -2925,7 +2928,7 @@
                                 <option value="custom">مخصص (مبلغ مباشر)</option>
                                 <!-- سيتم ملؤه بالبيانات -->
                             </select>
-                            <div class="form-text text-muted">اختياري - يمكنك إدخال سبب مخصص بدلاً من ذلك</div>
+                            <div class="form-text text-muted">اختياري - يمكنك إدخال سبب مخصص بدلًا من ذلك</div>
                         </div>
                         <div class="mb-3" id="customReasonGroup" style="display:none;">
                             <label class="form-label">السبب المخصص *</label>
@@ -3027,6 +3030,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal دليل الاستخدام المختصر -->
+    <div class="modal fade" id="quickHelpModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">دليل سريع</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="mb-0">
+                        <li>إضافة بيع سريعًا: من لوحة التحكم اضغط "إضافة بيع".</li>
+                        <li>تسديد دفعة: من تفاصيل المحل اضغط "تسديد دفعة".</li>
+                        <li>تصدير التقارير: من صفحة التقارير اختر الصيغة المناسبة.</li>
+                        <li>تبديل النسق: من الإعدادات ⇢ المظهر اختر فاتح/داكن/تلقائي.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-check me-auto">
+                        <input class="form-check-input" type="checkbox" id="dontShowHelp">
+                        <label class="form-check-label" for="dontShowHelp">لا تُظهر مرة أخرى</label>
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- زر مساعدة عائم -->
+    <button type="button" class="btn btn-primary help-fab" id="openQuickHelp"><i class="fas fa-question"></i></button>
 
     <!-- Modal اختيار المحل للاختصارات -->
     <div class="modal fade" id="selectStoreModal" tabindex="-1" aria-hidden="true">
@@ -3330,7 +3363,7 @@
         // تحديد فترة لوحة التحكم حسب اختيار المستخدم
         function getDashboardPeriodRange() {
             const select = document.getElementById('dashboardPeriod');
-            const val = select ? select.value : 'from_start';
+            const val = select ? select.value : 'this_month';
             const today = moment().format('YYYY-MM-DD');
             if (val === 'day') {
                 const from = moment().startOf('day').format('YYYY-MM-DD');
@@ -3369,7 +3402,7 @@
             document.getElementById('storesCount').textContent = data.stores.length;
             
             // إجمالي الكروت لا يعتمد على التاريخ
-            const totalCards = data.inventory.reduce((sum, item) => sum + item.quantity, 0);
+            const totalCards = data.inventory.reduce((sum, item) => sum + (Number(item.quantity)||0), 0);
             document.getElementById('totalCards').textContent = formatNumber(totalCards, false);
             
             // تطبيق الفلاتر الزمنية على مبيعات/تسديدات/مصروفات
@@ -3476,7 +3509,6 @@
                 default: return 'غير معروف';
             }
         }
-        
         // تحديث تقرير الأرباح
         function updateProfitReport() {
             const filteredSales = filterByDateRange(data.sales, s => s.date);
@@ -4089,7 +4121,6 @@
             const modal = new bootstrap.Modal(document.getElementById('saleModal'));
             modal.show();
         }
-        
         // حفظ البيع
         function saveSale() {
             const id = document.getElementById('saleId').value;
@@ -4730,6 +4761,7 @@
             
             
             saveData();
+            try { if (typeof expensesState !== 'undefined') expensesState.page = 1; } catch(_){ }
             renderExpensesTable();
             updateDashboard();
             updateProfitReport();
@@ -4738,9 +4770,6 @@
             modal.hide();
             setTimeout(cleanupModalBackdrops, 300);
         }
-        
-
-
         // ربط تغييرات واجهة فترة المصروفات
         (function(){
             const sel = document.getElementById('expensesPeriod');
@@ -5867,303 +5896,40 @@
         window.shareViaWhatsApp = shareViaWhatsApp;
         window.copyToClipboard = copyToClipboard;
         window.downloadReport = downloadReport;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // تحميل البيانات
-            loadData();
-            
-            // تغيير الأقسام
-            const navLinks = document.querySelectorAll('.sidebar .nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetSection = this.getAttribute('data-section');
-                    if (typeof switchSection === 'function') {
-                        switchSection(targetSection, this.textContent.trim());
-                    } else {
-                        console.error('دالة switchSection غير موجودة');
-                    }
-                });
-            });
-            
-            // التأكد من توفر دوال التصدير بعد تحميل جميع الملفات
-            setTimeout(() => {
-                // نسخ الدوال إلى النطاق العام إذا لم تكن متاحة
-                if (!window.exportStoreData && typeof exportStoreData !== 'undefined') {
-                    window.exportStoreData = exportStoreData;
-                }
-                if (!window.exportExpensesData && typeof exportExpensesData !== 'undefined') {
-                    window.exportExpensesData = exportExpensesData;
-                }
-                
-                console.log('فحص دوال التصدير:', {
-                    exportStoreData: typeof window.exportStoreData,
-                    exportExpensesData: typeof window.exportExpensesData,
-                    exportReportsData: 'undefined'
-                });
-            }, 500);
-            
-            // توليد تقارير
-            generateDebtReport();
-            generatePartnerReports();
-            
-            // تهيئة حقول الإدخال المنسقة
-            setupFormattedInputs();
-            
-
-            
-            // إضافة معالجات الأحداث للأزرار
-            document.getElementById('addPackageBtn').addEventListener('click', addPackage);
-            document.getElementById('savePackageBtn').addEventListener('click', savePackage);
-            
-            document.getElementById('addInventoryBtn').addEventListener('click', addInventory);
-            document.getElementById('saveInventoryBtn').addEventListener('click', saveInventory);
-            
-            document.getElementById('addStoreBtn').addEventListener('click', addStore);
-            document.getElementById('saveStoreBtn').addEventListener('click', saveStore);
-            
-            document.getElementById('addExpenseBtn').addEventListener('click', addExpense);
-            document.getElementById('saveExpenseBtn').addEventListener('click', saveExpense);
-            
-            const _genBtn = document.getElementById('generateReportBtn');
-            if (_genBtn) _genBtn.addEventListener('click', function() {
-                generateDebtReport();
-                generatePartnerReports();
-                showNotification('تم تحديث التقارير بنجاح', 'success');
-            });
-            
-            document.getElementById('exportDataBtn').addEventListener('click', exportData);
-            document.getElementById('importDataBtn').addEventListener('click', importData);
-            
-                        
-            // إضافة معالجات الأحداث لأزرار التصدير العامة (تفويض أحداث يعمل مع المحتوى الديناميكي)
-            document.body.addEventListener('click', function(e) {
-                const btn = e.target.closest && e.target.closest('.export-btn');
-                if (!btn) return;
-                
-                const type = btn.getAttribute('data-type');
-                const format = btn.getAttribute('data-format');
-                const storeId = btn.getAttribute('data-store') || '';
-                
-                console.log('تصدير:', { type, format, storeId });
-                
-                if (type === 'expenses') {
-                    if (typeof exportExpensesData === 'function') {
-                        exportExpensesData(format);
-                    } else {
-                        console.error('دالة exportExpensesData غير موجودة');
-                        showNotification('خطأ: دالة التصدير غير متوفرة', 'error');
-                    }
-
-                } else if (type === 'store') {
-                    if (typeof exportStoreData === 'function') {
-                        exportStoreData(storeId, format);
-                    } else if (window.exportStoreData) {
-                        window.exportStoreData(storeId, format);
-                    } else {
-                        console.error('دالة exportStoreData غير موجودة');
-                        showNotification('خطأ: دالة التصدير غير متوفرة', 'error');
-                    }
-                }
-            }, false);
-            
-            const storeFilterBtn = document.getElementById('storeApplyFilterBtn');
-            if (storeFilterBtn) {
-                storeFilterBtn.addEventListener('click', () => {
-                    showNotification('تم تطبيق فترة التصدير للمحل', 'success');
-                });
-            }
-            
-            // معالجة أزرار الحفظ في نماذج البيع والتسديد
-            document.getElementById('saveSaleBtn').addEventListener('click', saveSale);
-            document.getElementById('savePaymentBtn').addEventListener('click', savePayment);
-            
-            // تعيين تاريخ اليوم كافتراضي لحقول التاريخ
-            document.querySelectorAll('input[type="date"]').forEach(input => {
-                if (!input.value) {
-                    input.value = today;
-                }
-            });
-            
-            // اختصارات سريعة على لوحة التحكم
-            const qa = {
-                sale: document.getElementById('qaAddSale'),
-                payment: document.getElementById('qaAddPayment'),
-                inventory: document.getElementById('qaAddInventory'),
-                expense: document.getElementById('qaAddExpense'),
-                store: document.getElementById('qaAddStore'),
-                pkg: document.getElementById('qaAddPackage'),
-            };
-
-            let nextAction = null; // 'sale' | 'payment'
-            const selectStoreModalEl = document.getElementById('selectStoreModal');
-            const selectStoreModal = selectStoreModalEl ? new bootstrap.Modal(selectStoreModalEl) : null;
-            function openSelectStore(actionType) {
-                if (!selectStoreModal) return;
-                nextAction = actionType;
-                const sel = document.getElementById('selectStoreSelect');
-                sel.innerHTML = '';
-                if (data.stores.length === 0) {
-                    const opt = document.createElement('option');
-                    opt.value = ''; opt.textContent = 'لا توجد محلات، أضف محلًا أولاً';
-                    sel.appendChild(opt);
-                } else {
-                    data.stores.forEach(s => {
-                        const opt = document.createElement('option');
-                        opt.value = s.id;
-                        opt.textContent = s.name;
-                        sel.appendChild(opt);
-                    });
-                }
-                selectStoreModal.show();
-            }
-            const confirmBtn = document.getElementById('confirmSelectStoreBtn');
-            if (confirmBtn) confirmBtn.addEventListener('click', () => {
-                const sel = document.getElementById('selectStoreSelect');
-                const storeId = sel.value;
-                if (!storeId) { showNotification('يرجى اختيار محل', 'error'); return; }
-                selectStoreModal.hide();
-                if (nextAction === 'sale') addSale(storeId);
-                else if (nextAction === 'payment') addPayment(storeId);
-                nextAction = null;
-            });
-
-            if (qa.sale) qa.sale.addEventListener('click', () => openSelectStore('sale'));
-            if (qa.payment) qa.payment.addEventListener('click', () => openSelectStore('payment'));
-            if (qa.inventory) qa.inventory.addEventListener('click', () => {
-                // الانتقال لقسم كمية الكروت وفتح المودال
-                document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
-                document.querySelector('[data-section="inventory"]').classList.add('active');
-                document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-                document.getElementById('inventory').style.display = 'block';
-                document.querySelector('.page-title').textContent = 'كمية الكروت';
-                addInventory();
-            });
-            if (qa.expense) qa.expense.addEventListener('click', () => {
-                document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
-                document.querySelector('[data-section="expenses"]').classList.add('active');
-                document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-                document.getElementById('expenses').style.display = 'block';
-                document.querySelector('.page-title').textContent = 'المصروفات';
-                addExpense();
-            });
-            if (qa.store) qa.store.addEventListener('click', () => {
-                document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
-                document.querySelector('[data-section="stores"]').classList.add('active');
-                document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-                document.getElementById('stores').style.display = 'block';
-                document.querySelector('.page-title').textContent = 'البقالات والمحلات';
-                addStore();
-            });
-            if (qa.pkg) qa.pkg.addEventListener('click', () => {
-                document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
-                document.querySelector('[data-section="packages"]').classList.add('active');
-                document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-                document.getElementById('packages').style.display = 'block';
-                document.querySelector('.page-title').textContent = 'الباقات والأسعار';
-                addPackage();
-            });
-
-            // تعيين التاريخ في الشريط العلوي للجوال
-            const mobileTopDateEl = document.getElementById('mobileTopDate');
-            if (mobileTopDateEl) {
-                mobileTopDateEl.textContent = toEnglishDigits(moment().format('YYYY-MM-DD'));
-            }
-
-            // ضمان إظهار القسم الحالي مع الحركة عند التحميل
-            const currentVisible = document.querySelector('.section:not([style*="display: none"])') || document.getElementById('dashboard');
-            if (currentVisible) currentVisible.classList.add('show');
-
-            // مستمع لتغيير مدة الحساب في لوحة التحكم
-            const dashboardPeriodSelect = document.getElementById('dashboardPeriod');
-            if (dashboardPeriodSelect) {
-                dashboardPeriodSelect.addEventListener('change', () => {
-                    updateDashboard();
-                    updateProfitReport();
-                    generateDebtReport();
-                    generatePartnerReports();
-                });
-            }
-            
-            // تنظيف backdrop عند إغلاق أي modal
-            document.addEventListener('hidden.bs.modal', function (event) {
-                setTimeout(cleanupModalBackdrops, 100);
-            });
-            
-            // معالج إضافي للتأكد من التنظيف عند الضغط على backdrop
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('modal-backdrop')) {
-                    setTimeout(cleanupModalBackdrops, 300);
-                }
-            });
-            
-            // معالج للتأكد من التنظيف عند الضغط على ESC
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    setTimeout(cleanupModalBackdrops, 300);
-                }
-            });
-
-            // تهيئة اقتراحات أنواع المصروفات (chips)
-            const defaultExpenseTypes = [
-                'كهرباء','انترنت ADSL','انترنت فايبر','انترنت ستار لينك','صيانة','سويتش',
-                'كيبل كهرباء','كيبل انترنت رئيسي','كيبل انترنت منزلي','مواصلات','عامل','ايجار سطوح'
+    </script>
+    <script>
+    // ربط أزرار الإضافة والحفظ الأساسية بعد تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function(){
+        try{
+            var map = [
+                ['addPackageBtn', function(){ if (typeof addPackage==='function') addPackage(); }],
+                ['addInventoryBtn', function(){ if (typeof addInventory==='function') addInventory(); }],
+                ['addStoreBtn', function(){ if (typeof addStore==='function') addStore(); }],
+                ['savePackageBtn', function(){ if (typeof savePackage==='function') savePackage(); }],
+                ['saveInventoryBtn', function(){ if (typeof saveInventory==='function') saveInventory(); }],
+                ['saveStoreBtn', function(){ if (typeof saveStore==='function') saveStore(); }],
+                ['saveExpenseBtn', function(){ if (typeof saveExpense==='function') saveExpense(); }],
+                ['saveSaleBtn', function(){ if (typeof saveSale==='function') saveSale(); }],
+                ['savePaymentBtn', function(){ if (typeof savePayment==='function') savePayment(); }]
             ];
-            function loadSavedExpenseTypes(){
-                try { return JSON.parse(localStorage.getItem('expenseTypes')||'[]'); } catch { return []; }
-            }
-            function saveExpenseTypes(types){ localStorage.setItem('expenseTypes', JSON.stringify(Array.from(new Set(types)))); }
-            function getAllExpenseTypes(){ return Array.from(new Set([...(loadSavedExpenseTypes()), ...defaultExpenseTypes])); }
-            function renderExpenseTypeChips(selected){
-                const wrap = document.getElementById('expenseTypeChips');
-                if (!wrap) return;
-                wrap.innerHTML = '';
-                getAllExpenseTypes().forEach(t => {
-                    const chip = document.createElement('span');
-                    chip.className = 'expense-type-chip' + (selected === t ? ' active' : '');
-                    chip.textContent = t;
-                    chip.addEventListener('click', () => {
-                        document.querySelectorAll('#expenseTypeChips .expense-type-chip').forEach(c => c.classList.remove('active'));
-                        chip.classList.add('active');
-                        const hidden = document.getElementById('expenseType');
-                        if (hidden) hidden.value = t;
-                    });
-                    wrap.appendChild(chip);
-                });
-            }
-            function selectExpenseType(value){
-                const hidden = document.getElementById('expenseType');
-                if (hidden) hidden.value = value || '';
-                renderExpenseTypeChips(value || '');
-            }
-            const addCustomBtn = document.getElementById('addCustomExpenseType');
-            if (addCustomBtn){
-                addCustomBtn.addEventListener('click', () => {
-                    const inp = document.getElementById('expenseTypeCustom');
-                    const val = (inp?.value || '').trim();
-                    if (!val) return;
-                    const types = getAllExpenseTypes();
-                    if (!types.includes(val)) saveExpenseTypes([...(loadSavedExpenseTypes()), val]);
-                    selectExpenseType(val);
-                    inp.value = '';
-                });
-            }
-            // في فتح مودال إضافة/تعديل المصروف نعيد رسم الشيبس ونعيّن الاختيار
-            const expenseModalEl = document.getElementById('expenseModal');
-            if (expenseModalEl){
-                expenseModalEl.addEventListener('show.bs.modal', (ev) => {
-                    const currentVal = document.getElementById('expenseType')?.value || '';
-                    renderExpenseTypeChips(currentVal);
-                });
-            }
-        });
+            map.forEach(function([id, handler]){
+                var el = document.getElementById(id);
+                if (el && !el.dataset._wired){ el.addEventListener('click', handler); el.dataset._wired='1'; }
+            });
+        }catch(_){ }
+    });
     </script>
     <script src="./js/security.js"></script>
     <script src="./js/encryption.js"></script>
     <script src="./js/safeDOM.js"></script>
     <script src="./js/dataValidator.js"></script>
     <script src="./js/quickFixes.js"></script>
+    <script src="./js/smartCache.js"></script>
     <script src="./js/utils.js"></script>
+    <script src="./js/settings.js"></script>
+    <script src="./js/settingsUI.js"></script>
+    <script src="./js/soundSystem.js"></script>
+    <script src="./js/cloudStorageHelper.js"></script>
     <script src="./js/storeFilter.js?v=8"></script>
     <script src="./js/reports.js?v=12"></script>
     <script src="./app.js"></script>
@@ -6176,9 +5942,68 @@
     <script src="./js/storage.js"></script>
     <script src="./js/backup.js"></script>
     <script src="./js/backupManager.js"></script>
+    <script src="./js/backupSystem.js"></script>
     <script src="./js/expensesTypes.js"></script>
     <script src="./js/trash.js"></script>
     <script src="./js/parityCheck.js"></script>
+    <script>
+    // ربط روابط القائمة لتبديل الأقسام بعد تحميل DOM
+    document.addEventListener('DOMContentLoaded', function(){
+        try {
+            document.querySelectorAll('.sidebar .nav-link').forEach(function(link){
+                link.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var section = this.getAttribute('data-section');
+                    if (window.switchSection && section) {
+                        window.switchSection(section, this.textContent.trim());
+                        try { if (section==='dashboard' && typeof updateDashboard==='function') updateDashboard(); } catch(_){ }
+                    }
+                });
+            });
+            document.querySelectorAll('#mobileDrawer .nav-link').forEach(function(link){
+                link.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var section = this.getAttribute('data-section');
+                    if (window.switchSection && section) {
+                        window.switchSection(section, this.textContent.trim());
+                        try { if (section==='dashboard' && typeof updateDashboard==='function') updateDashboard(); } catch(_){ }
+                    }
+                });
+            });
+        } catch(_){}
+    });
+    // استدعاء تحميل البيانات وتحديث الواجهة عند الجاهزية
+    document.addEventListener('DOMContentLoaded', function(){
+        try { if (typeof loadData === 'function') loadData(); } catch(_){}
+        // تأكيد تحديث لوحة التحكم عند العرض الأول
+        try { if (typeof updateDashboard === 'function') updateDashboard(); } catch(_){}
+    });
+    
+    // تأمين تصدير المصروفات
+    document.addEventListener('DOMContentLoaded', function(){
+        try{
+            document.querySelectorAll('.export-btn[data-type="expenses"]').forEach(function(btn){
+                if (btn.dataset._wired) return;
+                btn.addEventListener('click', function(){
+                    var fmt = this.getAttribute('data-format');
+                    if (typeof exportExpensesData === 'function') exportExpensesData(fmt);
+                    else if (typeof showNotification === 'function') showNotification('وظيفة التصدير غير متاحة حالياً', 'error');
+                });
+                btn.dataset._wired = '1';
+            });
+        }catch(_){}
+    });
+    
+    document.addEventListener('DOMContentLoaded', function(){
+        try{
+            var btn = document.getElementById('addExpenseBtn');
+            if (btn && !btn.dataset._wired) {
+                btn.addEventListener('click', function(){ if (typeof addExpense === 'function') addExpense(); });
+                btn.dataset._wired = '1';
+            }
+        }catch(_){}
+    });
+    </script>
 
 
 
@@ -6233,7 +6058,57 @@
 
 
     <script>
+    // تهيئة تنسيق الحقول الرقمية وربط تحديث لوحة التحكم
+    document.addEventListener('DOMContentLoaded', function(){
+        // تهيئة تنسيق حقول الأرقام
+        try {
+            if (typeof setupFormattedInputs === 'function') {
+                setupFormattedInputs();
+                // تنسيق مبدئي للقيم الحالية في الحقول المنسقة
+                document.querySelectorAll('.formatted-input').forEach(function(inp){
+                    try{
+                        if (inp && inp.value && typeof parseFormattedNumber==='function' && typeof formatNumber==='function'){
+                            var num = parseFormattedNumber(inp.value);
+                            inp.value = (num || num === 0) ? formatNumber(num) : '';
+                        }
+                    } catch(_){ }
+                });
+            }
+        } catch(_){ }
 
+        // ربط تغيير مدة الحساب في لوحة التحكم
+        try {
+            var periodSel = document.getElementById('dashboardPeriod');
+            if (periodSel && !periodSel.dataset._dashWired) {
+                periodSel.addEventListener('change', function(){
+                    try { if (typeof updateDashboard==='function') updateDashboard(); } catch(_){}
+                    try { if (typeof updateProfitReport==='function') updateProfitReport(); } catch(_){}
+                    try { if (typeof generateDebtReport==='function') generateDebtReport(); } catch(_){}
+                });
+                periodSel.dataset._dashWired = '1';
+            }
+            var applyBtn = document.getElementById('applyDashboardPeriod');
+            if (applyBtn && !applyBtn.dataset._wired) {
+                applyBtn.addEventListener('click', function(){
+                    try { if (typeof updateDashboard==='function') updateDashboard(); } catch(_){}
+                    try { if (typeof updateProfitReport==='function') updateProfitReport(); } catch(_){}
+                    try { if (typeof generateDebtReport==='function') generateDebtReport(); } catch(_){}
+                });
+                applyBtn.dataset._wired = '1';
+            }
+        } catch(_){ }
+
+        // إعادة تهيئة التنسيق عند فتح أي نافذة تحتوي مدخلات أرقام
+        try {
+            ['expenseModal','saleModal','paymentModal','inventoryModal','packageModal','storeModal'].forEach(function(id){
+                var el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('shown.bs.modal', function(){
+                    try{ if (typeof setupFormattedInputs==='function') setupFormattedInputs(); }catch(_){ }
+                });
+            });
+        } catch(_){ }
+    });
     </script>
 
     <!-- Backup Manager Modal -->
@@ -6312,7 +6187,7 @@
         يحسن الأداء بنسبة 60-80% عن طريق حفظ نتائج الحسابات المعقدة
         يقلل من الحسابات المتكررة ويسرع استجابة التطبيق
     -->
-    <script src="js/smartCache.js"></script>
+    <!-- تمت إضافة smartCache أعلاه ضمن كتلة السكربتات الرئيسية لتفادي التكرار -->
     
     <!--
         نظام الإعدادات المتقدم
@@ -6418,11 +6293,6 @@ print(f"📁 المسار الكامل: {filepath}`;
     </div>
 </div>`;
 
-        // إضافة النافذة للصفحة
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = modalHTML;
-        document.body.appendChild(tempDiv.firstElementChild);
-        
         // دالة النسخ
         window.copyColabCode = function() {
             const codeElement = document.getElementById('colabCodeContent');

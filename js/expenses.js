@@ -41,6 +41,8 @@ function addExpense() {
   document.getElementById('expenseDate').value = formatDateEn(getTodayDate());
   document.getElementById('addLater').checked = false;
   const modal = new bootstrap.Modal(document.getElementById('expenseModal')); modal.show();
+  // تهيئة تنسيق المدخلات داخل المودال
+  try { if (typeof setupFormattedInputs==='function') setupFormattedInputs(); } catch(_){ }
 }
 
 /**
@@ -168,8 +170,11 @@ function saveExpense() {
     reportCache.invalidate(/^report_partner/);
     console.log('تم تحديث كاش التقارير بعد تغيير المصروفات');
   }
-  refreshCurrentView(); // تحديث جميع العروض المرئية
-  updateProfitReport(); // خاص بتقرير الأرباح
+  // تحديث فوري لجدول المصروفات ولوحة التحكم والتقارير
+  try { if (typeof expensesState !== 'undefined') expensesState.page = 1; } catch(_){ }
+  if (typeof renderExpensesTable === 'function') renderExpensesTable();
+  if (typeof updateDashboard === 'function') updateDashboard();
+  if (typeof updateProfitReport === 'function') updateProfitReport();
   if (typeof generatePartnerReports === 'function') generatePartnerReports();
   const modal = bootstrap.Modal.getInstance(document.getElementById('expenseModal')); 
   modal.hide();
@@ -460,24 +465,67 @@ function renderExpensesTable() {
       <th>الإجراءات</th>
     </tr>`;
     tableRoot.insertBefore(thead, table);
-    table.innerHTML = '';
-    pageItems.forEach(expense => {
-      const row = document.createElement('tr'); row.dataset.id = expense.id;
-      const selected = expensesSelection.has(expense.id);
-      row.innerHTML = `
-        <td><input type="checkbox" class="exp-row-select" data-id="${expense.id}" ${selected?'checked':''}></td>
-        <td class="cell-edit" data-key="date">${expense.date}</td>
-        <td class="cell-edit" data-key="type">${expense.type}</td>
-        <td class="cell-edit" data-key="amount"><span class="currency">${formatNumber(expense.amount)}</span></td>
-        <td class="cell-edit" data-key="notes">${expense.notes || ''}</td>
-        <td class="cell-edit" data-key="addLater">${expense.addLater ? '<span class="badge bg-warning">لاحقًا</span>' : '<span class="badge bg-success">مدفوع</span>'}</td>
-        <td class="action-buttons">
-          <button class="btn btn-sm btn-warning edit-expense" data-id="${expense.id}"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-sm btn-danger delete-expense" data-id="${expense.id}"><i class="fas fa-trash"></i></button>
-        </td>`;
-      row.querySelectorAll('.cell-edit').forEach(cell => { cell.addEventListener('dblclick', ()=> startInlineEditExpense(row, expense)); });
-      table.appendChild(row);
-    });
+    // تفعيل العرض الافتراضي عند الحاجة
+    const useVirtual = (typeof AppSettings!=='undefined' && AppSettings.get && (AppSettings.get('performance.virtualScrolling') === true));
+    const rowHeight = 48; // تقدير ارتفاع الصف
+    if (useVirtual) {
+      const container = table.parentElement; // .table-responsive
+      const allItems = pageItems; // ما بعد البحث/الترتيب/التقسيم
+      function renderSlice() {
+        if (!container) return;
+        const scrollTop = container.scrollTop;
+        const containerHeight = container.clientHeight || 600;
+        const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - 6);
+        const endIndex = Math.min(allItems.length, Math.ceil((scrollTop + containerHeight) / rowHeight) + 6);
+        const slice = allItems.slice(startIndex, endIndex);
+        table.innerHTML = '';
+        const topSpacer = document.createElement('tr'); topSpacer.style.height = (startIndex * rowHeight) + 'px'; topSpacer.innerHTML = '<td colspan="7"></td>';
+        table.appendChild(topSpacer);
+        slice.forEach(expense => {
+          const row = document.createElement('tr'); row.dataset.id = expense.id;
+          const selected = expensesSelection.has(expense.id);
+          row.innerHTML = `
+            <td><input type="checkbox" class="exp-row-select" data-id="${expense.id}" ${selected?'checked':''}></td>
+            <td class="cell-edit" data-key="date">${expense.date}</td>
+            <td class="cell-edit" data-key="type">${expense.type}</td>
+            <td class="cell-edit" data-key="amount"><span class="currency">${formatNumber(expense.amount)}</span></td>
+            <td class="cell-edit" data-key="notes">${expense.notes || ''}</td>
+            <td class="cell-edit" data-key="addLater">${expense.addLater ? '<span class="badge bg-warning">لاحقًا</span>' : '<span class="badge bg-success">مدفوع</span>'}</td>
+            <td class="action-buttons">
+              <button class="btn btn-sm btn-warning edit-expense" data-id="${expense.id}"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-danger delete-expense" data-id="${expense.id}"><i class="fas fa-trash"></i></button>
+            </td>`;
+          row.querySelectorAll('.cell-edit').forEach(cell => { cell.addEventListener('dblclick', ()=> startInlineEditExpense(row, expense)); });
+          table.appendChild(row);
+        });
+        const bottomSpacer = document.createElement('tr'); bottomSpacer.style.height = ((allItems.length - endIndex) * rowHeight) + 'px'; bottomSpacer.innerHTML = '<td colspan="7"></td>';
+        table.appendChild(bottomSpacer);
+        // إعادة ربط الأحداث لكل مجموعة معروضة
+        table.querySelectorAll('.edit-expense').forEach(btn => { btn.addEventListener('click', () => editExpense(btn.dataset.id)); });
+        table.querySelectorAll('.delete-expense').forEach(btn => { btn.addEventListener('click', () => deleteExpense(btn.dataset.id)); });
+      }
+      renderSlice();
+      if (container && !container._virtExpBound) { container.addEventListener('scroll', renderSlice, { passive: true }); container._virtExpBound = true; }
+    } else {
+      table.innerHTML = '';
+      pageItems.forEach(expense => {
+        const row = document.createElement('tr'); row.dataset.id = expense.id;
+        const selected = expensesSelection.has(expense.id);
+        row.innerHTML = `
+          <td><input type="checkbox" class="exp-row-select" data-id="${expense.id}" ${selected?'checked':''}></td>
+          <td class="cell-edit" data-key="date">${expense.date}</td>
+          <td class="cell-edit" data-key="type">${expense.type}</td>
+          <td class="cell-edit" data-key="amount"><span class="currency">${formatNumber(expense.amount)}</span></td>
+          <td class="cell-edit" data-key="notes">${expense.notes || ''}</td>
+          <td class="cell-edit" data-key="addLater">${expense.addLater ? '<span class="badge bg-warning">لاحقًا</span>' : '<span class="badge bg-success">مدفوع</span>'}</td>
+          <td class="action-buttons">
+            <button class="btn btn-sm btn-warning edit-expense" data-id="${expense.id}"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-danger delete-expense" data-id="${expense.id}"><i class="fas fa-trash"></i></button>
+          </td>`;
+        row.querySelectorAll('.cell-edit').forEach(cell => { cell.addEventListener('dblclick', ()=> startInlineEditExpense(row, expense)); });
+        table.appendChild(row);
+      });
+    }
     const selAll = document.getElementById('expensesSelectAll');
     if (selAll) selAll.addEventListener('change', ()=>{
       table.querySelectorAll('.exp-row-select').forEach(cb => { cb.checked = selAll.checked; const id = cb.getAttribute('data-id'); if (selAll.checked) expensesSelection.add(id); else expensesSelection.delete(id); });

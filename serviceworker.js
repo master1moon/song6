@@ -12,7 +12,7 @@
  * - لا يعطي تحديثات للمستخدم عن حالة الاتصال
  */
 
-const CACHE_NAME = 'network-cards-cache-v1.7';
+const CACHE_NAME = 'network-cards-cache-v2.0';
 
 /**
  * قائمة الموارد الحرجة المطلوبة لعمل التطبيق
@@ -26,6 +26,23 @@ const CRITICAL_ASSETS = [
   './manifest.json',
   // './fonts/Amiri-Regular.woff2', // معطل مؤقتاً لكونه غير صالح
   './app.js',
+  './libs/bootstrap/css/bootstrap.min.css',
+  './libs/bootstrap/js/bootstrap.bundle.min.js',
+  './libs/fontawesome/css/all.min.css',
+  './libs/fontawesome/webfonts/fa-solid-900.woff2',
+  './libs/fontawesome/webfonts/fa-regular-400.woff2',
+  './libs/fontawesome/webfonts/fa-brands-400.woff2',
+  './libs/moment/moment.min.js',
+  './libs/moment/ar.min.js',
+  './libs/xlsx/xlsx.full.min.js',
+  './libs/jspdf/jspdf.umd.min.js',
+  './libs/jspdf-autotable/jspdf.plugin.autotable.min.js',
+  './libs/html2pdf/html2pdf.bundle.min.js',
+  './js/smartCache.js',
+  './js/settings.js',
+  './js/settingsUI.js',
+  './js/soundSystem.js',
+  './js/cloudStorageHelper.js',
   './js/security.js',
   './js/encryption.js',
   './js/safeDOM.js',
@@ -41,7 +58,12 @@ const CRITICAL_ASSETS = [
   './js/storage.js',
   './js/backup.js',
   './js/backupManager.js',
+  './js/backupSystem.js',
+  './js/reportsWorker.js',
+  './js/storeFilter.js',
+  './js/expensesTypes.js',
   './js/trash.js',
+  './js/parityCheck.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png'
