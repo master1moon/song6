@@ -12,7 +12,7 @@
  * - لا يعطي تحديثات للمستخدم عن حالة الاتصال
  */
 
-const CACHE_NAME = 'network-cards-cache-v1.9';
+const CACHE_NAME = 'network-cards-cache-v2.0';
 
 /**
  * قائمة الموارد الحرجة المطلوبة لعمل التطبيق

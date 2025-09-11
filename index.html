@@ -5975,6 +5975,8 @@
     // استدعاء تحميل البيانات وتحديث الواجهة عند الجاهزية
     document.addEventListener('DOMContentLoaded', function(){
         try { if (typeof loadData === 'function') loadData(); } catch(_){}
+        // تأكيد تحديث لوحة التحكم عند العرض الأول
+        try { if (typeof updateDashboard === 'function') updateDashboard(); } catch(_){}
     });
     
     // تأمين تصدير المصروفات
