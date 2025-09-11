@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp"
+    app:rippleColor="@color/ripple_color">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- مؤشر الحالة -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/indicator_status"
+            android:layout_width="8dp"
+            android:layout_height="0dp"
+            app:cardBackgroundColor="@color/success"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- أيقونة الأولوية -->
+        <ImageView
+            android:id="@+id/icon_priority"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_vip"
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@id/indicator_status"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/accent"
+            tools:visibility="visible" />
+
+        <!-- اسم المحل -->
+        <TextView
+            android:id="@+id/text_store_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/on_surface"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/text_store_balance"
+            app:layout_constraintStart_toEndOf="@id/indicator_status"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="محل الشبكات الذهبية" />
+
+        <!-- الرصيد -->
+        <TextView
+            android:id="@+id/text_store_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_balance_chip"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:textColor="@color/on_primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="1,250 ريال" />
+
+        <!-- رقم الهاتف -->
+        <TextView
+            android:id="@+id/text_store_phone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:drawablePadding="8dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="14sp"
+            app:drawableStartCompat="@drawable/ic_phone"
+            app:drawableTint="@color/on_surface_variant"
+            app:layout_constraintEnd_toStartOf="@id/chip_price_type"
+            app:layout_constraintStart_toEndOf="@id/indicator_status"
+            app:layout_constraintTop_toBottomOf="@id/text_store_name"
+            tools:text="0501234567" />
+
+        <!-- نوع السعر -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_price_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="تجزئة"
+            android:textSize="12sp"
+            app:chipBackgroundColor="@color/chip_retail_bg"
+            app:chipCornerRadius="12dp"
+            app:chipMinHeight="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_store_balance"
+            tools:text="تجزئة" />
+
+        <!-- العنوان -->
+        <TextView
+            android:id="@+id/text_store_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:drawablePadding="8dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="13sp"
+            app:drawableStartCompat="@drawable/ic_location"
+            app:drawableTint="@color/on_surface_variant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/indicator_status"
+            app:layout_constraintTop_toBottomOf="@id/text_store_phone"
+            tools:text="الرياض - حي الملك فهد" />
+
+        <!-- آخر نشاط -->
+        <TextView
+            android:id="@+id/text_last_activity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:drawablePadding="6dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="12sp"
+            app:drawableStartCompat="@drawable/ic_history"
+            app:drawableTint="@color/on_surface_variant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/indicator_status"
+            app:layout_constraintTop_toBottomOf="@id/text_store_address"
+            tools:text="آخر بيع: منذ يومين" />
+
+        <!-- فاصل -->
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/indicator_status"
+            app:layout_constraintTop_toBottomOf="@id/text_last_activity" />
+
+        <!-- أزرار الإجراءات -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:gravity="end"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/indicator_status"
+            app:layout_constraintTop_toBottomOf="@id/divider">
+
+            <!-- زر الاتصال -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_call"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@string/call_store"
+                app:icon="@drawable/ic_phone"
+                app:iconSize="18dp"
+                app:iconTint="@color/success" />
+
+            <!-- زر الموقع -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_location"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@string/open_location"
+                app:icon="@drawable/ic_map"
+                app:iconSize="18dp"
+                app:iconTint="@color/info" />
+
+            <!-- زر التعديل -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_edit"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="@string/edit_store"
+                app:icon="@drawable/ic_edit"
+                app:iconSize="18dp"
+                app:iconTint="@color/warning" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

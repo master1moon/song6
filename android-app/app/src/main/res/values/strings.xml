@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- اسم التطبيق -->
+    <string name="app_name">إدارة كروت الشبكة</string>
+    <string name="app_name_short">كروت الشبكة</string>
+    
+    <!-- التنقل الرئيسي -->
+    <string name="dashboard">لوحة التحكم</string>
+    <string name="stores">المحلات</string>
+    <string name="packages">الباقات</string>
+    <string name="inventory">المخزون</string>
+    <string name="sales">المبيعات</string>
+    <string name="payments">المدفوعات</string>
+    <string name="expenses">المصروفات</string>
+    <string name="reports">التقارير</string>
+    <string name="settings">الإعدادات</string>
+    
+    <!-- الإجراءات العامة -->
+    <string name="add">إضافة</string>
+    <string name="edit">تعديل</string>
+    <string name="delete">حذف</string>
+    <string name="save">حفظ</string>
+    <string name="cancel">إلغاء</string>
+    <string name="ok">موافق</string>
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
+    <string name="search">بحث</string>
+    <string name="filter">فلترة</string>
+    <string name="sort">ترتيب</string>
+    <string name="export">تصدير</string>
+    <string name="import">استيراد</string>
+    <string name="backup">نسخة احتياطية</string>
+    <string name="sync">مزامنة</string>
+    <string name="refresh">تحديث</string>
+    
+    <!-- المحلات -->
+    <string name="add_new_store">إضافة محل جديد</string>
+    <string name="store_name">اسم المحل</string>
+    <string name="store_phone">رقم الهاتف</string>
+    <string name="store_address">العنوان</string>
+    <string name="store_notes">ملاحظات</string>
+    <string name="price_type">نوع السعر</string>
+    <string name="store_balance">الرصيد</string>
+    <string name="stores_count">%d محل</string>
+    <string name="call_store">الاتصال بالمحل</string>
+    <string name="open_location">فتح الموقع</string>
+    <string name="edit_store">تعديل المحل</string>
+    
+    <!-- أنواع الأسعار -->
+    <string name="price_retail">تجزئة</string>
+    <string name="price_wholesale">جملة</string>
+    <string name="price_distributor">موزعين</string>
+    
+    <!-- الباقات -->
+    <string name="add_new_package">إضافة باقة جديدة</string>
+    <string name="package_name">اسم الباقة</string>
+    <string name="package_description">وصف الباقة</string>
+    <string name="retail_price">سعر التجزئة</string>
+    <string name="wholesale_price">سعر الجملة</string>
+    <string name="distributor_price">سعر الموزعين</string>
+    <string name="current_stock">المخزون الحالي</string>
+    <string name="min_stock_level">الحد الأدنى</string>
+    <string name="barcode">الباركود</string>
+    
+    <!-- المبيعات -->
+    <string name="add_new_sale">إضافة بيع جديد</string>
+    <string name="sale_quantity">الكمية</string>
+    <string name="sale_price">السعر</string>
+    <string name="sale_total">الإجمالي</string>
+    <string name="sale_date">تاريخ البيع</string>
+    <string name="custom_sale">بيع مخصص</string>
+    <string name="custom_reason">سبب البيع المخصص</string>
+    
+    <!-- المدفوعات -->
+    <string name="add_new_payment">إضافة دفعة جديدة</string>
+    <string name="payment_amount">مبلغ الدفعة</string>
+    <string name="payment_method">طريقة الدفع</string>
+    <string name="payment_date">تاريخ الدفع</string>
+    <string name="payment_notes">ملاحظات الدفعة</string>
+    <string name="reference_number">الرقم المرجعي</string>
+    
+    <!-- طرق الدفع -->
+    <string name="payment_cash">نقدي</string>
+    <string name="payment_check">شيك</string>
+    <string name="payment_bank_transfer">تحويل بنكي</string>
+    <string name="payment_credit_card">بطاقة ائتمان</string>
+    <string name="payment_digital_wallet">محفظة رقمية</string>
+    
+    <!-- التقارير -->
+    <string name="profit_loss_report">تقرير الأرباح والخسائر</string>
+    <string name="debt_report">تقرير الديون</string>
+    <string name="sales_report">تقرير المبيعات</string>
+    <string name="inventory_report">تقرير المخزون</string>
+    <string name="from_date">من تاريخ</string>
+    <string name="to_date">إلى تاريخ</string>
+    <string name="generate_report">إنشاء التقرير</string>
+    
+    <!-- الإحصائيات -->
+    <string name="total_sales">إجمالي المبيعات</string>
+    <string name="total_payments">إجمالي المدفوعات</string>
+    <string name="total_debt">إجمالي الديون</string>
+    <string name="net_profit">صافي الربح</string>
+    <string name="total_stores">عدد المحلات</string>
+    <string name="total_packages">عدد الباقات</string>
+    <string name="low_stock_items">مواد منخفضة المخزون</string>
+    
+    <!-- الإعدادات -->
+    <string name="app_settings">إعدادات التطبيق</string>
+    <string name="github_sync">مزامنة GitHub</string>
+    <string name="backup_settings">إعدادات النسخ الاحتياطي</string>
+    <string name="notification_settings">إعدادات الإشعارات</string>
+    <string name="display_settings">إعدادات العرض</string>
+    <string name="security_settings">إعدادات الأمان</string>
+    
+    <!-- المسح الضوئي -->
+    <string name="scan_barcode">مسح الباركود</string>
+    <string name="scan_instruction">وجه الكاميرا نحو الباركود</string>
+    <string name="flashlight">الفلاش</string>
+    <string name="manual_entry">إدخال يدوي</string>
+    <string name="scan_result">نتيجة المسح: %s</string>
+    
+    <!-- رسائل الخطأ -->
+    <string name="error_network">خطأ في الشبكة</string>
+    <string name="error_database">خطأ في قاعدة البيانات</string>
+    <string name="error_permission_camera">صلاحية الكاميرا مطلوبة</string>
+    <string name="error_permission_phone">صلاحية الاتصال مطلوبة</string>
+    <string name="error_invalid_data">بيانات غير صحيحة</string>
+    <string name="error_file_not_found">الملف غير موجود</string>
+    
+    <!-- رسائل النجاح -->
+    <string name="success_store_added">تم إضافة المحل بنجاح</string>
+    <string name="success_store_updated">تم تحديث المحل بنجاح</string>
+    <string name="success_store_deleted">تم حذف المحل بنجاح</string>
+    <string name="success_sale_added">تم إضافة البيع بنجاح</string>
+    <string name="success_payment_added">تم إضافة الدفعة بنجاح</string>
+    <string name="success_sync_complete">تمت المزامنة بنجاح</string>
+    <string name="success_backup_created">تم إنشاء النسخة الاحتياطية</string>
+    <string name="success_data_exported">تم تصدير البيانات بنجاح</string>
+    
+    <!-- رسائل التأكيد -->
+    <string name="confirm_delete_store">هل أنت متأكد من حذف هذا المحل؟</string>
+    <string name="confirm_delete_package">هل أنت متأكد من حذف هذه الباقة؟</string>
+    <string name="confirm_delete_sale">هل أنت متأكد من حذف هذا البيع؟</string>
+    <string name="confirm_exit_app">هل أنت متأكد من الخروج من التطبيق؟</string>
+    
+    <!-- حالات فارغة -->
+    <string name="empty_stores">لا توجد محلات</string>
+    <string name="empty_packages">لا توجد باقات</string>
+    <string name="empty_sales">لا توجد مبيعات</string>
+    <string name="empty_payments">لا توجد مدفوعات</string>
+    <string name="empty_search_results">لا توجد نتائج للبحث</string>
+    
+    <!-- التحميل -->
+    <string name="loading">جاري التحميل...</string>
+    <string name="loading_stores">جاري تحميل المحلات...</string>
+    <string name="loading_packages">جاري تحميل الباقات...</string>
+    <string name="loading_sales">جاري تحميل المبيعات...</string>
+    <string name="processing">جاري المعالجة...</string>
+    <string name="syncing">جاري المزامنة...</string>
+    
+    <!-- أخرى -->
+    <string name="add_new">إضافة جديد</string>
+    <string name="no_data">لا توجد بيانات</string>
+    <string name="try_again">إعادة المحاولة</string>
+    <string name="offline_mode">وضع عدم الاتصال</string>
+    <string name="online_mode">متصل</string>
+    <string name="last_sync">آخر مزامنة: %s</string>
+    <string name="never_synced">لم تتم المزامنة مطلقاً</string>
+    
+    <!-- التواريخ -->
+    <string name="today">اليوم</string>
+    <string name="yesterday">أمس</string>
+    <string name="this_week">هذا الأسبوع</string>
+    <string name="this_month">هذا الشهر</string>
+    <string name="days_ago">منذ %d أيام</string>
+    <string name="weeks_ago">منذ %d أسابيع</string>
+    <string name="months_ago">منذ %d أشهر</string>
+    
+    <!-- العملة -->
+    <string name="currency_symbol">ريال</string>
+    <string name="currency_format">%s ريال</string>
+    
+    <!-- أحجام الملفات -->
+    <string name="file_size_kb">%s كيلوبايت</string>
+    <string name="file_size_mb">%s ميجابايت</string>
+    
+    <!-- الإشعارات -->
+    <string name="notification_new_sale">بيع جديد</string>
+    <string name="notification_new_payment">دفعة جديدة</string>
+    <string name="notification_low_stock">مخزون منخفض</string>
+    <string name="notification_overdue_payment">مدفوعات متأخرة</string>
+    <string name="notification_daily_summary">ملخص اليوم</string>
+    <string name="notification_backup_reminder">تذكير النسخة الاحتياطية</string>
+    
+</resources>

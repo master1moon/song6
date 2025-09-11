@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- الصلاحيات المطلوبة -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
+        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" 
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
+    <!-- ميزات الكاميرا -->
+    <uses-feature 
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature 
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+    <application
+        android:name=".NetworkCardsApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.NetworkCards"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+        
+        <!-- الشاشة الرئيسية -->
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.NetworkCards.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <!-- شاشة تفاصيل المحل -->
+        <activity
+            android:name=".ui.store.StoreDetailsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:theme="@style/Theme.NetworkCards.NoActionBar" />
+        
+        <!-- شاشة إضافة/تعديل المحل -->
+        <activity
+            android:name=".ui.store.AddEditStoreActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.store.StoreDetailsActivity"
+            android:windowSoftInputMode="adjustResize" />
+        
+        <!-- شاشة إضافة/تعديل الباقة -->
+        <activity
+            android:name=".ui.package.AddEditPackageActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
+        
+        <!-- شاشة التقارير -->
+        <activity
+            android:name=".ui.reports.ReportsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+        
+        <!-- شاشة الإعدادات -->
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+        
+        <!-- شاشة مسح الباركود -->
+        <activity
+            android:name=".ui.scanner.BarcodeScannerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.NetworkCards.FullScreen" />
+        
+        <!-- شاشة البداية (Splash) -->
+        <activity
+            android:name=".ui.splash.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NetworkCards.Splash"
+            android:noHistory="true">
+        </activity>
+        
+        <!-- خدمة المزامنة في الخلفية -->
+        <service
+            android:name=".service.SyncService"
+            android:exported="false" />
+        
+        <!-- مستقبل الإشعارات -->
+        <receiver
+            android:name=".receiver.NotificationReceiver"
+            android:exported="false" />
+        
+        <!-- موفر الملفات -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        
+    </application>
+
+</manifest>
