@@ -77,16 +77,17 @@
         if (!settings.performance && defaults.performance) { settings.performance = defaults.performance; }
         
         // تحميل إعدادات العرض
-        if (!settings.display) return; // لا شيء لعرضه بعد
-        setElementValue('setting-theme', settings.display.theme || 'auto');
-        setElementValue('setting-fontSize', settings.display.fontSize);
-        setElementValue('setting-fontWeight', settings.display.fontWeight);
-        setElementValue('setting-density', settings.display.density);
-        setElementValue('setting-primaryColor', settings.display.primaryColor);
-        setElementValue('setting-secondaryColor', settings.display.secondaryColor);
-        setElementValue('setting-textColor', settings.display.textColor);
-        setElementChecked('setting-animations', settings.display.animations);
-        setElementChecked('setting-roundedCorners', settings.display.roundedCorners);
+        const display = (settings.display || defaults.display || {});
+        if (!display || Object.keys(display).length === 0) return; // لا شيء لعرضه بعد
+        setElementValue('setting-theme', display.theme || 'auto');
+        setElementValue('setting-fontSize', display.fontSize);
+        setElementValue('setting-fontWeight', display.fontWeight);
+        setElementValue('setting-density', display.density);
+        setElementValue('setting-primaryColor', display.primaryColor);
+        setElementValue('setting-secondaryColor', display.secondaryColor);
+        setElementValue('setting-textColor', display.textColor);
+        setElementChecked('setting-animations', display.animations);
+        setElementChecked('setting-roundedCorners', display.roundedCorners);
 
         // تحميل إعدادات المالية
         setElementValue('setting-currency', settings.financial.currency);
