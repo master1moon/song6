@@ -5950,6 +5950,21 @@
     document.addEventListener('DOMContentLoaded', function(){
         try { if (typeof loadData === 'function') loadData(); } catch(_){}
     });
+    
+    // تأمين تصدير المصروفات
+    document.addEventListener('DOMContentLoaded', function(){
+        try{
+            document.querySelectorAll('.export-btn[data-type="expenses"]').forEach(function(btn){
+                if (btn.dataset._wired) return;
+                btn.addEventListener('click', function(){
+                    var fmt = this.getAttribute('data-format');
+                    if (typeof exportExpensesData === 'function') exportExpensesData(fmt);
+                    else if (typeof showNotification === 'function') showNotification('وظيفة التصدير غير متاحة حالياً', 'error');
+                });
+                btn.dataset._wired = '1';
+            });
+        }catch(_){}
+    });
     </script>
 
 
