@@ -170,8 +170,11 @@ function saveExpense() {
     reportCache.invalidate(/^report_partner/);
     console.log('تم تحديث كاش التقارير بعد تغيير المصروفات');
   }
-  refreshCurrentView(); // تحديث جميع العروض المرئية
-  updateProfitReport(); // خاص بتقرير الأرباح
+  // تحديث فوري لجدول المصروفات ولوحة التحكم والتقارير
+  try { if (typeof expensesState !== 'undefined') expensesState.page = 1; } catch(_){ }
+  if (typeof renderExpensesTable === 'function') renderExpensesTable();
+  if (typeof updateDashboard === 'function') updateDashboard();
+  if (typeof updateProfitReport === 'function') updateProfitReport();
   if (typeof generatePartnerReports === 'function') generatePartnerReports();
   const modal = bootstrap.Modal.getInstance(document.getElementById('expenseModal')); 
   modal.hide();

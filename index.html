@@ -1997,7 +1997,7 @@
 
             <!-- لوحة التحكم -->
             <div id="dashboard" class="section">
-                <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="d-flex align-items-center gap-2 mb-3" id="dashboardPeriodWrap">
                     <label for="dashboardPeriod" class="mb-0">مدة الحساب:</label>
                     <select id="dashboardPeriod" class="form-select form-select-sm" style="width:auto;">
                         <option value="from_start">من البداية</option>
@@ -2007,6 +2007,7 @@
                         <option value="this_month" selected>خلال هذا الشهر</option>
                         <option value="prev_month">خلال الشهر السابق</option>
                     </select>
+                    <button type="button" id="applyDashboardPeriod" class="btn btn-sm btn-outline-primary">تطبيق</button>
                 </div>
                 <div class="stats-container">
                     <div class="stat-box">
@@ -5955,6 +5956,7 @@
                     var section = this.getAttribute('data-section');
                     if (window.switchSection && section) {
                         window.switchSection(section, this.textContent.trim());
+                        try { if (section==='dashboard' && typeof updateDashboard==='function') updateDashboard(); } catch(_){ }
                     }
                 });
             });
@@ -5964,6 +5966,7 @@
                     var section = this.getAttribute('data-section');
                     if (window.switchSection && section) {
                         window.switchSection(section, this.textContent.trim());
+                        try { if (section==='dashboard' && typeof updateDashboard==='function') updateDashboard(); } catch(_){ }
                     }
                 });
             });
@@ -6081,6 +6084,15 @@
                     try { if (typeof generateDebtReport==='function') generateDebtReport(); } catch(_){}
                 });
                 periodSel.dataset._dashWired = '1';
+            }
+            var applyBtn = document.getElementById('applyDashboardPeriod');
+            if (applyBtn && !applyBtn.dataset._wired) {
+                applyBtn.addEventListener('click', function(){
+                    try { if (typeof updateDashboard==='function') updateDashboard(); } catch(_){}
+                    try { if (typeof updateProfitReport==='function') updateProfitReport(); } catch(_){}
+                    try { if (typeof generateDebtReport==='function') generateDebtReport(); } catch(_){}
+                });
+                applyBtn.dataset._wired = '1';
             }
         } catch(_){ }
 
