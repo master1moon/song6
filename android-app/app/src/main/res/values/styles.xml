@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- الثيم الرئيسي للتطبيق -->
+    <style name="Theme.NetworkCards" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- الألوان الأساسية -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_variant</item>
+        
+        <!-- ألوان السطح -->
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorBackground">@color/background</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorOnBackground">@color/on_background</item>
+        
+        <!-- ألوان الحالة -->
+        <item name="colorError">@color/error</item>
+        
+        <!-- شريط الحالة -->
+        <item name="android:statusBarColor">@color/primary_variant</item>
+        <item name="android:windowLightStatusBar">false</item>
+        
+        <!-- شريط التنقل -->
+        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        
+        <!-- الخطوط -->
+        <item name="fontFamily">@font/tajawal_regular</item>
+        
+        <!-- الأشكال -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.NetworkCards.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.NetworkCards.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.NetworkCards.LargeComponent</item>
+    </style>
+    
+    <!-- ثيم بدون شريط علوي -->
+    <style name="Theme.NetworkCards.NoActionBar" parent="Theme.NetworkCards">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    
+    <!-- ثيم شاشة البداية -->
+    <style name="Theme.NetworkCards.Splash" parent="Theme.NetworkCards.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+    
+    <!-- ثيم شاشة كاملة -->
+    <style name="Theme.NetworkCards.FullScreen" parent="Theme.NetworkCards.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+    
+    <!-- أشكال المكونات -->
+    <style name="ShapeAppearance.NetworkCards.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerSize">8dp</item>
+    </style>
+    
+    <style name="ShapeAppearance.NetworkCards.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerSize">12dp</item>
+    </style>
+    
+    <style name="ShapeAppearance.NetworkCards.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSize">16dp</item>
+    </style>
+    
+    <!-- أنماط النصوص -->
+    <style name="TextAppearance.NetworkCards.Headline1" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="fontFamily">@font/tajawal_bold</item>
+    </style>
+    
+    <style name="TextAppearance.NetworkCards.Headline2" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="fontFamily">@font/tajawal_bold</item>
+    </style>
+    
+    <style name="TextAppearance.NetworkCards.Body1" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="fontFamily">@font/tajawal_regular</item>
+    </style>
+    
+    <style name="TextAppearance.NetworkCards.Body2" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/on_surface_variant</item>
+        <item name="fontFamily">@font/tajawal_regular</item>
+    </style>
+    
+    <style name="TextAppearance.NetworkCards.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/on_surface_variant</item>
+        <item name="fontFamily">@font/tajawal_light</item>
+    </style>
+    
+    <!-- أنماط الأزرار -->
+    <style name="Widget.NetworkCards.Button" parent="Widget.Material3.Button">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">@font/tajawal_medium</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+    
+    <style name="Widget.NetworkCards.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">@font/tajawal_medium</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+    
+    <style name="Widget.NetworkCards.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">@font/tajawal_medium</item>
+    </style>
+    
+    <!-- أنماط الكروت -->
+    <style name="Widget.NetworkCards.CardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+    
+    <!-- أنماط حقول الإدخال -->
+    <style name="Widget.NetworkCards.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">8dp</item>
+        <item name="boxCornerRadiusTopEnd">8dp</item>
+        <item name="boxCornerRadiusBottomStart">8dp</item>
+        <item name="boxCornerRadiusBottomEnd">8dp</item>
+        <item name="hintTextAppearance">@style/TextAppearance.NetworkCards.Caption</item>
+    </style>
+    
+    <!-- أنماط التبويبات -->
+    <style name="Widget.NetworkCards.TabLayout" parent="Widget.Material3.TabLayout">
+        <item name="tabTextAppearance">@style/TextAppearance.NetworkCards.Body2</item>
+        <item name="tabSelectedTextColor">@color/primary</item>
+        <item name="tabTextColor">@color/on_surface_variant</item>
+        <item name="tabIndicatorColor">@color/primary</item>
+        <item name="tabIndicatorHeight">3dp</item>
+    </style>
+    
+    <!-- أنماط التنقل السفلي -->
+    <style name="BottomNavigationTextActive" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">@font/tajawal_medium</item>
+    </style>
+    
+    <style name="BottomNavigationTextInactive" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">@font/tajawal_regular</item>
+    </style>
+    
+    <!-- أنماط الإحصائيات -->
+    <style name="StatCardTitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/on_surface_variant</item>
+        <item name="fontFamily">@font/tajawal_regular</item>
+        <item name="android:gravity">center</item>
+    </style>
+    
+    <style name="StatCardValue">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="fontFamily">@font/tajawal_bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+    
+    <style name="StatCardSubtitle">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/on_surface_variant</item>
+        <item name="fontFamily">@font/tajawal_light</item>
+        <item name="android:gravity">center</item>
+    </style>
+    
+    <!-- أنماط الرقائق -->
+    <style name="Widget.NetworkCards.Chip" parent="Widget.Material3.Chip.Filter">
+        <item name="chipCornerRadius">12dp</item>
+        <item name="chipMinHeight">32dp</item>
+        <item name="textStartPadding">12dp</item>
+        <item name="textEndPadding">12dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="fontFamily">@font/tajawal_medium</item>
+    </style>
+    
+    <!-- أنماط شريط التقدم -->
+    <style name="Widget.NetworkCards.ProgressBar" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="indicatorColor">@color/primary</item>
+        <item name="trackColor">@color/surface_variant</item>
+        <item name="trackCornerRadius">2dp</item>
+        <item name="indicatorCornerRadius">2dp</item>
+    </style>
+    
+    <!-- أنماط الفواصل -->
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/divider</item>
+    </style>
+    
+    <style name="VerticalDivider">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/divider</item>
+    </style>
+    
+    <!-- أنماط الظلال -->
+    <style name="CardElevation1">
+        <item name="cardElevation">1dp</item>
+    </style>
+    
+    <style name="CardElevation2">
+        <item name="cardElevation">2dp</item>
+    </style>
+    
+    <style name="CardElevation4">
+        <item name="cardElevation">4dp</item>
+    </style>
+    
+    <style name="CardElevation8">
+        <item name="cardElevation">8dp</item>
+    </style>
+    
+    <!-- أنماط الحركة -->
+    <style name="Animation.Slide">
+        <item name="android:windowEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_left</item>
+    </style>
+    
+    <style name="Animation.Fade">
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
+    </style>
+    
+    <!-- أنماط خاصة بالتطبيق -->
+    <style name="StoreItemCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="rippleColor">@color/ripple_color</item>
+    </style>
+    
+    <style name="PackageItemCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">6dp</item>
+        <item name="cardCornerRadius">8dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="rippleColor">@color/ripple_color</item>
+    </style>
+    
+    <style name="StatCard">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="cardCornerRadius">8dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="contentPadding">16dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    
+    <!-- أنماط الحالات الفارغة -->
+    <style name="EmptyStateText">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/on_surface_variant</item>
+        <item name="fontFamily">@font/tajawal_regular</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">24dp</item>
+    </style>
+    
+    <!-- أنماط أزرار الإجراءات -->
+    <style name="ActionButton" parent="Widget.Material3.Button.IconButton">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="iconSize">18dp</item>
+    </style>
+    
+    <style name="ActionButton.Call">
+        <item name="iconTint">@color/success</item>
+        <item name="icon">@drawable/ic_phone</item>
+    </style>
+    
+    <style name="ActionButton.Location">
+        <item name="iconTint">@color/info</item>
+        <item name="icon">@drawable/ic_map</item>
+    </style>
+    
+    <style name="ActionButton.Edit">
+        <item name="iconTint">@color/warning</item>
+        <item name="icon">@drawable/ic_edit</item>
+    </style>
+    
+    <style name="ActionButton.Delete">
+        <item name="iconTint">@color/error</item>
+        <item name="icon">@drawable/ic_delete</item>
+    </style>
+    
+    <!-- أنماط الرقائق -->
+    <style name="Chip.PriceType" parent="Widget.Material3.Chip.Filter">
+        <item name="chipCornerRadius">12dp</item>
+        <item name="chipMinHeight">24dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="fontFamily">@font/tajawal_medium</item>
+    </style>
+    
+    <style name="Chip.Status" parent="Widget.Material3.Chip.Assist">
+        <item name="chipCornerRadius">8dp</item>
+        <item name="chipMinHeight">20dp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="fontFamily">@font/tajawal_medium</item>
+    </style>
+    
+    <!-- أنماط شريط الأدوات -->
+    <style name="Widget.NetworkCards.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="titleTextAppearance">@style/TextAppearance.NetworkCards.Headline2</item>
+        <item name="titleTextColor">@color/on_primary</item>
+    </style>
+    
+    <!-- أنماط النوافذ المنبثقة -->
+    <style name="Widget.NetworkCards.BottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="backgroundTint">@color/surface</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.NetworkCards.LargeComponent</item>
+    </style>
+    
+    <!-- أنماط التحميل -->
+    <style name="LoadingText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/on_surface_variant</item>
+        <item name="fontFamily">@font/tajawal_regular</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginTop">16dp</item>
+    </style>
+    
+    <!-- أنماط العملة -->
+    <style name="CurrencyText">
+        <item name="android:textSize">16sp</item>
+        <item name="fontFamily">@font/tajawal_bold</item>
+        <item name="android:gravity">end</item>
+    </style>
+    
+    <style name="CurrencyText.Large">
+        <item name="android:textSize">20sp</item>
+    </style>
+    
+    <style name="CurrencyText.Small">
+        <item name="android:textSize">12sp</item>
+    </style>
+    
+    <!-- أنماط الأرصدة -->
+    <style name="BalanceText" parent="CurrencyText">
+        <item name="android:textColor">@color/balance_positive</item>
+    </style>
+    
+    <style name="BalanceText.Negative">
+        <item name="android:textColor">@color/balance_negative</item>
+    </style>
+    
+    <style name="BalanceText.Zero">
+        <item name="android:textColor">@color/balance_zero</item>
+    </style>
+    
+</resources>
