@@ -855,7 +855,7 @@
                     <div class="col-md-6">
                         <label class="form-label">نوع القفل</label>
                         <select class="form-select" id="setting-lockType"
-                                onchange="AppSettings.update('security.lockType', this.value)">
+                                onchange="AppSettings.update('security.lockType', this.value); toggleLockCredentials(this.value)">
                             <option value="none" ${security.lockType === 'none' ? 'selected' : ''}>بدون قفل</option>
                             <option value="pin" ${security.lockType === 'pin' ? 'selected' : ''}>رمز PIN</option>
                             <option value="password" ${security.lockType === 'password' ? 'selected' : ''}>كلمة مرور</option>
@@ -915,6 +915,41 @@
                             <label class="form-check-label" for="setting-activityLog">
                                 سجل النشاطات
                             </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- إعدادات PIN وكلمة المرور -->
+                <div class="row mb-3" id="lockCredentials" style="${security.lockType === 'none' ? 'display:none' : ''}">
+                    <div class="col-md-6" id="pinSection" style="${security.lockType === 'pin' ? '' : 'display:none'}">
+                        <label class="form-label">رمز PIN (4-6 أرقام)</label>
+                        <input type="password" class="form-control" id="setting-pin"
+                               value="${security.pin || ''}" maxlength="6" placeholder="أدخل رمز PIN"
+                               onchange="AppSettings.update('security.pin', this.value)">
+                        <div class="form-text">سيستخدم لفتح الشاشة المقفلة</div>
+                    </div>
+                    <div class="col-md-6" id="passwordSection" style="${security.lockType === 'password' ? '' : 'display:none'}">
+                        <label class="form-label">كلمة المرور</label>
+                        <input type="password" class="form-control" id="setting-password"
+                               value="${security.password || ''}" placeholder="أدخل كلمة المرور"
+                               onchange="AppSettings.update('security.password', this.value)">
+                        <div class="form-text">يجب أن تكون 8 أحرف على الأقل</div>
+                    </div>
+                </div>
+
+                <!-- أزرار اختبار القفل -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button class="btn btn-outline-warning" onclick="testScreenLock()" 
+                                    ${security.lockType === 'none' ? 'disabled' : ''}>
+                                <i class="fas fa-vial me-2"></i>
+                                اختبار القفل
+                            </button>
+                            <button class="btn btn-outline-info" onclick="resetSecuritySettings()">
+                                <i class="fas fa-undo me-2"></i>
+                                إعادة تعيين
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1750,6 +1785,50 @@
         if (w) {
             try { w.focus(); } catch(_) {}
             setTimeout(() => { try { w.print(); } catch(_) {} }, 500);
+        }
+    };
+
+    // دوال مساعدة لإعدادات الأمان
+    window.toggleLockCredentials = function(lockType) {
+        const lockCredentials = document.getElementById('lockCredentials');
+        const pinSection = document.getElementById('pinSection');
+        const passwordSection = document.getElementById('passwordSection');
+        const testButton = document.querySelector('button[onclick="testScreenLock()"]');
+        
+        if (lockCredentials) {
+            if (lockType === 'none') {
+                lockCredentials.style.display = 'none';
+                if (testButton) testButton.disabled = true;
+            } else {
+                lockCredentials.style.display = '';
+                if (testButton) testButton.disabled = false;
+            }
+        }
+        
+        if (pinSection) {
+            pinSection.style.display = lockType === 'pin' ? '' : 'none';
+        }
+        
+        if (passwordSection) {
+            passwordSection.style.display = lockType === 'password' ? '' : 'none';
+        }
+    };
+    
+    window.testScreenLock = function() {
+        if (typeof window.screenLock !== 'undefined') {
+            window.screenLock.testLock();
+        } else {
+            showNotification('نظام قفل الشاشة غير متاح', 'error');
+        }
+    };
+    
+    window.resetSecuritySettings = function() {
+        if (confirm('هل أنت متأكد من إعادة تعيين إعدادات الأمان؟')) {
+            AppSettings.reset('security');
+            if (typeof refreshSettings === 'function') {
+                refreshSettings();
+            }
+            showNotification('تم إعادة تعيين إعدادات الأمان', 'info');
         }
     };
 

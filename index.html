@@ -2061,12 +2061,15 @@
                         <span class="visually-hidden">إعدادات القفل</span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#lockSettingsModal">
-                            <i class="fas fa-cog me-2"></i>إعدادات القفل
+                        <li><a class="dropdown-item" href="#" onclick="screenLock.openSecuritySettings()">
+                            <i class="fas fa-cog me-2"></i>إعدادات الأمان
                         </a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" onclick="screenLock.disableAutoLock(60)">
                             <i class="fas fa-clock me-2"></i>تعطيل لساعة واحدة
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" onclick="screenLock.testLock()">
+                            <i class="fas fa-vial me-2"></i>اختبار القفل
                         </a></li>
                     </ul>
                 </div>
@@ -6709,110 +6712,8 @@ print(f"📁 المسار الكامل: {filepath}`;
         }, 4500);
     }
     
-    /**
-     * حفظ إعدادات قفل الشاشة
-     */
-    function saveLockSettings() {
-        const settings = {
-            autoLockEnabled: document.getElementById('autoLockEnabled').checked,
-            inactivityMinutes: parseInt(document.getElementById('inactivityMinutes').value),
-            pin: document.getElementById('lockPin').value
-        };
-        
-        // التحقق من صحة PIN
-        if (!/^\d{4,6}$/.test(settings.pin)) {
-            showNotification('رمز PIN يجب أن يكون 4-6 أرقام', 'error');
-            return;
-        }
-        
-        // حفظ الإعدادات
-        if (typeof window.screenLock !== 'undefined') {
-            window.screenLock.saveSettings(settings);
-        }
-        
-        // إغلاق Modal
-        $('#lockSettingsModal').modal('hide');
-        
-        // إظهار رسالة نجاح
-        showNotification('تم حفظ إعدادات القفل بنجاح', 'success');
-        
-        console.log('تم حفظ إعدادات القفل:', settings);
-    }
-    
-    /**
-     * تحميل إعدادات القفل عند فتح Modal
-     */
-    document.addEventListener('DOMContentLoaded', function() {
-        const lockModal = document.getElementById('lockSettingsModal');
-        if (lockModal) {
-            lockModal.addEventListener('show.bs.modal', function() {
-                if (typeof window.screenLock !== 'undefined') {
-                    const settings = window.screenLock.getSettings();
-                    
-                    document.getElementById('autoLockEnabled').checked = settings.autoLockEnabled;
-                    document.getElementById('inactivityMinutes').value = settings.inactivityMinutes;
-                    document.getElementById('lockPin').value = settings.pin;
-                }
-            });
-        }
-    });
     </script>
     
-    <!-- إعدادات قفل الشاشة Modal -->
-    <div class="modal fade" id="lockSettingsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-lock me-2"></i>
-                        إعدادات قفل الشاشة
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="autoLockEnabled" checked>
-                        <label class="form-check-label" for="autoLockEnabled">
-                            تفعيل القفل التلقائي
-                        </label>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="inactivityMinutes" class="form-label">مدة عدم النشاط (بالدقائق)</label>
-                        <select class="form-select" id="inactivityMinutes">
-                            <option value="5">5 دقائق</option>
-                            <option value="10">10 دقائق</option>
-                            <option value="15" selected>15 دقيقة</option>
-                            <option value="30">30 دقيقة</option>
-                            <option value="60">ساعة واحدة</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="lockPin" class="form-label">رمز PIN (4-6 أرقام)</label>
-                        <input type="password" class="form-control" id="lockPin" value="1234" maxlength="6" placeholder="أدخل رمز PIN">
-                        <div class="form-text">يستخدم لفتح الشاشة المقفلة</div>
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        سيتم قفل التطبيق تلقائياً بعد فترة عدم النشاط المحددة
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-outline-warning" onclick="screenLock.manualLock(); $('#lockSettingsModal').modal('hide');">
-                        <i class="fas fa-lock me-2"></i>
-                        اختبار القفل
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="saveLockSettings()">
-                        <i class="fas fa-save me-2"></i>
-                        حفظ الإعدادات
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!--
         مراقب أداء الكاش (اختياري)

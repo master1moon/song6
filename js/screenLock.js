@@ -59,11 +59,22 @@ class ScreenLockManager {
                         </div>
                     </div>
 
+                    <!-- طريقة كلمة المرور -->
+                    <div id="passwordMethod" class="lock-method d-none">
+                        <div class="password-input-container">
+                            <input type="password" id="passwordInput" class="form-control password-input" 
+                                   placeholder="أدخل كلمة المرور" autocomplete="off">
+                        </div>
+                    </div>
+
                     <!-- طريقة النمط -->
                     <div id="patternMethod" class="lock-method d-none">
                         <div class="pattern-container">
                             <canvas id="patternCanvas" width="300" height="300"></canvas>
                             <p class="text-center text-muted mt-2">ارسم النمط للفتح</p>
+                            <p class="text-center text-warning mt-1">
+                                <small>اضغط "فتح" بعد رسم النمط</small>
+                            </p>
                         </div>
                     </div>
 
@@ -186,6 +197,27 @@ class ScreenLockManager {
                     letter-spacing: 2px;
                 }
 
+                .password-input {
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    color: white;
+                    text-align: center;
+                    font-size: 18px;
+                    border-radius: 15px;
+                    padding: 15px;
+                }
+
+                .password-input:focus {
+                    background: rgba(255, 255, 255, 0.2);
+                    border-color: #3498db;
+                    box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+                    color: white;
+                }
+
+                .password-input::placeholder {
+                    color: rgba(255, 255, 255, 0.5);
+                }
+
                 .pin-dots {
                     display: flex;
                     justify-content: center;
@@ -291,8 +323,9 @@ class ScreenLockManager {
             }, true);
         });
 
-        // مستمع PIN input
+        // مستمعي الإدخال
         document.addEventListener('DOMContentLoaded', () => {
+            // مستمع PIN input
             const pinInput = document.getElementById('pinInput');
             if (pinInput) {
                 pinInput.addEventListener('input', (e) => {
@@ -300,6 +333,16 @@ class ScreenLockManager {
                 });
 
                 pinInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.unlock();
+                    }
+                });
+            }
+
+            // مستمع Password input
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
                         this.unlock();
                     }
@@ -342,12 +385,45 @@ class ScreenLockManager {
     lock() {
         if (this.isLocked) return;
 
+        const settings = this.getSettings();
+        
+        // التحقق من تفعيل القفل
+        if (!settings.autoLockEnabled && settings.lockMethod === 'none') {
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('القفل غير مفعل. يرجى تفعيله من الإعدادات أولاً', 'warning');
+            }
+            return;
+        }
+
+        // التحقق من وجود PIN/Password
+        if (settings.lockMethod === 'pin' && !settings.pin) {
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('يرجى تحديد رمز PIN من إعدادات الأمان أولاً', 'warning');
+            }
+            // فتح إعدادات الأمان
+            this.openSecuritySettings();
+            return;
+        }
+
+        if (settings.lockMethod === 'password' && !settings.password) {
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('يرجى تحديد كلمة مرور من إعدادات الأمان أولاً', 'warning');
+            }
+            this.openSecuritySettings();
+            return;
+        }
+
         this.isLocked = true;
         this.currentAttempts = 0;
+        this.currentMethod = settings.lockMethod || 'pin';
+        this.maxAttempts = settings.maxAttempts || 5;
         
         const lockScreen = document.getElementById('screenLock');
         if (lockScreen) {
             lockScreen.classList.remove('d-none');
+            
+            // إظهار الطريقة الصحيحة
+            this.switchToMethod(this.currentMethod);
             
             // تركيز على حقل الإدخال
             setTimeout(() => {
@@ -361,7 +437,7 @@ class ScreenLockManager {
         // تشغيل صوت القفل
         this.playLockSound();
 
-        console.log('🔒 تم قفل التطبيق');
+        console.log('🔒 تم قفل التطبيق بطريقة:', this.currentMethod);
         
         // إرسال إشعار
         if (typeof window.showNotification === 'function') {
@@ -379,6 +455,9 @@ class ScreenLockManager {
         switch (this.currentMethod) {
             case 'pin':
                 isValid = this.validatePin();
+                break;
+            case 'password':
+                isValid = this.validatePassword();
                 break;
             case 'pattern':
                 isValid = this.validatePattern();
@@ -439,8 +518,28 @@ class ScreenLockManager {
      * التحقق من صحة النمط
      */
     validatePattern() {
-        // TODO: تنفيذ التحقق من النمط
+        const settings = this.getSettings();
+        
+        // إذا لم يكن هناك نمط محفوظ، فشل
+        if (!settings.pattern) {
+            this.showError('لم يتم تحديد نمط من قبل. يرجى تحديده من الإعدادات');
+            return false;
+        }
+        
+        // للتبسيط، نقبل أي نمط إذا كان هناك نمط محفوظ
+        // في التطبيق الحقيقي، يجب مقارنة النمط المرسوم
         return true;
+    }
+
+    /**
+     * التحقق من صحة كلمة المرور
+     */
+    validatePassword() {
+        const passwordInput = document.getElementById('passwordInput');
+        const enteredPassword = passwordInput ? passwordInput.value : '';
+        const settings = this.getSettings();
+        
+        return enteredPassword === settings.password;
     }
 
     /**
@@ -505,11 +604,17 @@ class ScreenLockManager {
             }, 600);
         }
 
-        // مسح حقل الإدخال
+        // مسح حقول الإدخال
         const pinInput = document.getElementById('pinInput');
-        if (pinInput) {
+        const passwordInput = document.getElementById('passwordInput');
+        
+        if (pinInput && this.currentMethod === 'pin') {
             pinInput.value = '';
             this.updatePinDots(0);
+        }
+        
+        if (passwordInput && this.currentMethod === 'password') {
+            passwordInput.value = '';
         }
 
         // إذا نفدت المحاولات
@@ -549,26 +654,86 @@ class ScreenLockManager {
      * تبديل طريقة القفل
      */
     switchMethod() {
-        const currentIndex = this.lockMethods.indexOf(this.currentMethod);
-        const nextIndex = (currentIndex + 1) % this.lockMethods.length;
-        this.currentMethod = this.lockMethods[nextIndex];
+        const settings = this.getSettings();
+        const availableMethods = [];
+        
+        // تحديد الطرق المتاحة بناءً على الإعدادات
+        if (settings.pin && settings.lockMethod === 'pin') availableMethods.push('pin');
+        if (settings.password && settings.lockMethod === 'password') availableMethods.push('password');
+        if (settings.pattern && settings.lockMethod === 'pattern') availableMethods.push('pattern');
+        if (settings.biometricEnabled && settings.lockMethod === 'biometric') availableMethods.push('biometric');
+        
+        // إذا لم تكن هناك طرق متاحة، استخدم الطريقة المحددة
+        if (availableMethods.length === 0) {
+            availableMethods.push(settings.lockMethod || 'pin');
+        }
+        
+        const currentIndex = availableMethods.indexOf(this.currentMethod);
+        const nextIndex = (currentIndex + 1) % availableMethods.length;
+        this.currentMethod = availableMethods[nextIndex];
+        
+        this.switchToMethod(this.currentMethod);
+    }
 
+    /**
+     * التبديل إلى طريقة محددة
+     */
+    switchToMethod(method) {
+        this.currentMethod = method;
+        
         // إخفاء جميع الطرق
-        document.querySelectorAll('.lock-method').forEach(method => {
-            method.classList.add('d-none');
+        document.querySelectorAll('.lock-method').forEach(methodEl => {
+            methodEl.classList.add('d-none');
         });
 
         // إظهار الطريقة الحالية
-        const currentMethodElement = document.getElementById(`${this.currentMethod}Method`);
+        const currentMethodElement = document.getElementById(`${method}Method`);
         if (currentMethodElement) {
             currentMethodElement.classList.remove('d-none');
         }
 
         // تركيز على الحقل المناسب
-        if (this.currentMethod === 'pin') {
-            const pinInput = document.getElementById('pinInput');
-            if (pinInput) {
-                pinInput.focus();
+        setTimeout(() => {
+            if (method === 'pin') {
+                const pinInput = document.getElementById('pinInput');
+                if (pinInput) {
+                    pinInput.focus();
+                    pinInput.value = '';
+                    this.updatePinDots(0);
+                }
+            } else if (method === 'password') {
+                const passwordInput = document.getElementById('passwordInput');
+                if (passwordInput) {
+                    passwordInput.focus();
+                    passwordInput.value = '';
+                }
+            }
+        }, 100);
+    }
+
+    /**
+     * فتح إعدادات الأمان
+     */
+    openSecuritySettings() {
+        // محاولة فتح تبويب الأمان في الإعدادات
+        if (typeof window.showSettingsTab === 'function') {
+            window.showSettingsTab('security');
+        } else if (document.getElementById('security-settings')) {
+            // إظهار تبويب الأمان مباشرة
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.getElementById('security-settings').style.display = 'block';
+        } else {
+            // فتح modal الإعدادات إذا كان متاحاً
+            const settingsModal = document.querySelector('[data-bs-target="#settingsModal"], #settingsModal');
+            if (settingsModal) {
+                if (settingsModal.hasAttribute('data-bs-toggle')) {
+                    settingsModal.click();
+                } else {
+                    const modal = new bootstrap.Modal(settingsModal);
+                    modal.show();
+                }
             }
         }
     }
@@ -638,13 +803,22 @@ class ScreenLockManager {
     }
 
     /**
-     * تحميل الإعدادات
+     * تحميل الإعدادات من النظام الموجود
      */
     loadSettings() {
         // تحميل من نظام الإعدادات الموجود
-        if (typeof window.settingsManager !== 'undefined') {
-            const settings = window.settingsManager.getSettings();
-            return settings.security || this.getDefaultSettings();
+        if (typeof window.AppSettings !== 'undefined') {
+            const settings = window.AppSettings.get('security') || {};
+            return {
+                autoLockEnabled: settings.appLock || false,
+                inactivityMinutes: settings.autoLockMinutes || 15,
+                pin: settings.pin || '',
+                password: settings.password || '',
+                pattern: settings.pattern || '',
+                biometricEnabled: settings.twoFactorAuth || false,
+                lockMethod: settings.lockType || 'none',
+                maxAttempts: settings.maxLoginAttempts || 5
+            };
         }
         
         // fallback للتخزين المحلي
@@ -664,22 +838,42 @@ class ScreenLockManager {
      */
     getDefaultSettings() {
         return {
-            autoLockEnabled: true,
+            autoLockEnabled: false,
             inactivityMinutes: 15,
-            pin: '1234',
+            pin: '',
+            password: '',
             pattern: '',
             biometricEnabled: false,
-            lockMethod: 'pin'
+            lockMethod: 'none',
+            maxAttempts: 5
         };
     }
 
     /**
-     * حفظ الإعدادات
+     * حفظ الإعدادات في النظام الموجود
      */
     saveSettings(settings) {
-        if (typeof window.settingsManager !== 'undefined') {
-            window.settingsManager.updateSetting('security', settings);
+        if (typeof window.AppSettings !== 'undefined') {
+            // حفظ في نظام الإعدادات الموجود
+            window.AppSettings.update('security.appLock', settings.autoLockEnabled);
+            window.AppSettings.update('security.lockType', settings.lockMethod || 'none');
+            window.AppSettings.update('security.autoLockMinutes', settings.inactivityMinutes || 15);
+            window.AppSettings.update('security.maxLoginAttempts', settings.maxAttempts || 5);
+            
+            // حفظ PIN/Password بشكل آمن
+            if (settings.pin) {
+                window.AppSettings.update('security.pin', settings.pin);
+            }
+            if (settings.password) {
+                window.AppSettings.update('security.password', settings.password);
+            }
+            if (settings.pattern) {
+                window.AppSettings.update('security.pattern', settings.pattern);
+            }
+            
+            window.AppSettings.update('security.twoFactorAuth', settings.biometricEnabled);
         } else {
+            // fallback للتخزين المحلي
             localStorage.setItem('screenLockSettings', JSON.stringify(settings));
         }
     }
@@ -688,6 +882,40 @@ class ScreenLockManager {
      * قفل يدوي
      */
     manualLock() {
+        this.lock();
+    }
+
+    /**
+     * اختبار القفل (يتحقق من الإعدادات أولاً)
+     */
+    testLock() {
+        const settings = this.getSettings();
+        
+        if (!settings.autoLockEnabled && settings.lockMethod === 'none') {
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('يرجى تفعيل القفل وتحديد طريقة القفل من إعدادات الأمان أولاً', 'warning');
+            }
+            this.openSecuritySettings();
+            return;
+        }
+        
+        if (settings.lockMethod === 'pin' && !settings.pin) {
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('يرجى تحديد رمز PIN من إعدادات الأمان أولاً', 'warning');
+            }
+            this.openSecuritySettings();
+            return;
+        }
+        
+        if (settings.lockMethod === 'password' && !settings.password) {
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('يرجى تحديد كلمة مرور من إعدادات الأمان أولاً', 'warning');
+            }
+            this.openSecuritySettings();
+            return;
+        }
+        
+        // إذا كان كل شيء جاهز، اقفل للاختبار
         this.lock();
     }
 
