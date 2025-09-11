@@ -28,14 +28,14 @@
             return;
         }
 
-        // تحميل الإعدادات الحالية في الواجهة
-        loadSettingsToUI();
+        // تحميل الإعدادات الحالية في الواجهة (آمن)
+        try { loadSettingsToUI(); } catch(_) {}
 
         // إضافة مستمعات الأحداث
         setupEventListeners();
 
-        // إنشاء محتوى التبويبات الديناميكي
-        createSettingsTabs();
+        // إنشاء محتوى التبويبات الديناميكي (مع fallback لاحق)
+        try { createSettingsTabs(); } catch(_) {}
 
         // إذا كان هناك تبويب محدد مسبقاً كـ active في قائمة #settingsTabs، افتحه افتراضياً
         try {
@@ -45,6 +45,12 @@
                 switchSettingsTab(initialTab);
             }
         } catch (_) {}
+        // إعادة التحميل عند تطبيق الإعدادات
+        try {
+            document.addEventListener('settingsChanged', function(){
+                try { loadSettingsToUI(); createSettingsTabs(); } catch(_){ }
+            });
+        } catch(_){ }
     }
 
     /**
@@ -61,10 +67,18 @@
      * المخرجات: راجع التنفيذ
      */
     function loadSettingsToUI() {
-        const settings = AppSettings.getAll();
+        const settings = (typeof AppSettings!=='undefined' && AppSettings.getAll) ? (AppSettings.getAll()||{}) : {};
+        const defaults = (typeof AppSettings!=='undefined' && AppSettings.defaultSettings) ? (AppSettings.defaultSettings()||{}) : {};
+        if (!settings.display && defaults.display) { settings.display = defaults.display; }
+        if (!settings.financial && defaults.financial) { settings.financial = defaults.financial; }
+        if (!settings.notifications && defaults.notifications) { settings.notifications = defaults.notifications; }
+        if (!settings.backup && defaults.backup) { settings.backup = defaults.backup; }
+        if (!settings.security && defaults.security) { settings.security = defaults.security; }
+        if (!settings.performance && defaults.performance) { settings.performance = defaults.performance; }
         
         // تحميل إعدادات العرض
-        setElementValue('setting-theme', settings.display.theme);
+        if (!settings.display) return; // لا شيء لعرضه بعد
+        setElementValue('setting-theme', settings.display.theme || 'auto');
         setElementValue('setting-fontSize', settings.display.fontSize);
         setElementValue('setting-fontWeight', settings.display.fontWeight);
         setElementValue('setting-density', settings.display.density);
