@@ -2155,6 +2155,13 @@ function exportExpensesData(format) {
       win.document.open(); win.document.write(html); win.document.close();
       showNotification(format === 'pdf' ? 'تم فتح صفحة الطباعة. اضغط حفظ كـ PDF.' : 'تم فتح صفحة التقرير.', 'success');
     } catch (e) { showNotification(format === 'pdf' ? 'حدث خطأ أثناء إنشاء PDF' : 'تعذر فتح صفحة التقرير', 'error'); }
+  } else if (format === 'printpage') {
+    try {
+      const html = buildExpensesReportHTML(mapped, periodText);
+      const win = window.open('', '_blank'); if (!win || !win.document) { showNotification('يمنع المتصفح النوافذ المنبثقة. الرجاء السماح بها.', 'error'); return; }
+      win.document.open(); win.document.write(html); win.document.close();
+      showNotification('تم فتح صفحة التقرير.', 'success');
+    } catch (e) { showNotification('تعذر فتح صفحة التقرير', 'error'); }
   } else if (format === 'json') {
     const dataStr = JSON.stringify({ المدة: periodText, المصروفات: mapped, الملخص: { الإجمالي: overallTotal, حسب_الشهر: Object.fromEntries(Array.from(monthTotals.entries())) } }, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(blob);
