@@ -1,0 +1,78 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Make gradlew executable
+      run: chmod +x gradlew
+      
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+      
+    - name: Build Release APK
+      run: ./gradlew assembleRelease
+      
+    - name: Upload APK as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: NetworkCardsManager-APKs
+        path: |
+          app/build/outputs/apk/debug/*.apk
+          app/build/outputs/apk/release/*.apk
+          
+    - name: Create Release
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.0.0
+        release_name: Network Cards Manager v1.0.0
+        body: |
+          🚀 إدارة كروت الشبكة اللاسلكية - الإصدار الأول
+          
+          ✨ الميزات:
+          - إدارة شاملة للمحلات والعملاء
+          - مسح الباركود المتقدم
+          - تقارير ورسوم بيانية تفاعلية
+          - إشعارات ذكية
+          - مزامنة مع التطبيق الويب
+          - تصميم Material Design 3
+          
+          📱 متطلبات النظام:
+          - Android 7.0 (API 24) أو أحدث
+          - 50 MB مساحة تخزين
+          - اتصال إنترنت للمزامنة
+        draft: false
+        prerelease: false
