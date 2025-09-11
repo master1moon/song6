@@ -53,8 +53,9 @@ function toEnglishDigits(input) {
  * المخرجات: راجع التنفيذ
  */
 function formatNumber(num) {
-  if (num === null || num === undefined) return '';
-  const n = Number(toEnglishDigits(num)) || 0;
+  if (num === null || num === undefined || num === '') return '';
+  const n = Number(toEnglishDigits(num));
+  if (isNaN(n)) return '';
   return n.toLocaleString('en-US');
 }
 

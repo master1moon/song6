@@ -5895,6 +5895,28 @@
         window.copyToClipboard = copyToClipboard;
         window.downloadReport = downloadReport;
     </script>
+    <script>
+    // ربط أزرار الإضافة والحفظ الأساسية بعد تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function(){
+        try{
+            var map = [
+                ['addPackageBtn', function(){ if (typeof addPackage==='function') addPackage(); }],
+                ['addInventoryBtn', function(){ if (typeof addInventory==='function') addInventory(); }],
+                ['addStoreBtn', function(){ if (typeof addStore==='function') addStore(); }],
+                ['savePackageBtn', function(){ if (typeof savePackage==='function') savePackage(); }],
+                ['saveInventoryBtn', function(){ if (typeof saveInventory==='function') saveInventory(); }],
+                ['saveStoreBtn', function(){ if (typeof saveStore==='function') saveStore(); }],
+                ['saveExpenseBtn', function(){ if (typeof saveExpense==='function') saveExpense(); }],
+                ['saveSaleBtn', function(){ if (typeof saveSale==='function') saveSale(); }],
+                ['savePaymentBtn', function(){ if (typeof savePayment==='function') savePayment(); }]
+            ];
+            map.forEach(function([id, handler]){
+                var el = document.getElementById(id);
+                if (el && !el.dataset._wired){ el.addEventListener('click', handler); el.dataset._wired='1'; }
+            });
+        }catch(_){ }
+    });
+    </script>
     <script src="./js/security.js"></script>
     <script src="./js/encryption.js"></script>
     <script src="./js/safeDOM.js"></script>
