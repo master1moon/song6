@@ -600,13 +600,39 @@ if (typeof window !== 'undefined') {
         <div>جميع الحقوق محفوظة © ${year}</div>
         <div>م / نجيب المقداد</div>
         <div class="mt-2" style="font-size:12px; opacity:.8;">يُحظر النسخ أو التوزيع بدون إذن</div>
+        <div class="mt-3" style="font-size:13px; opacity:.95;">
+          <span class="badge bg-primary">تلميح</span>
+          <span class="ms-2">لإضافة عملية بيع بسرعة: من لوحة التحكم اضغط "إضافة بيع".</span>
+        </div>
       `;
       if (typeof setHTML === 'function') { setHTML(rightsEl, rightsHtml); } else { rightsEl.innerHTML = rightsHtml; }
       splash.style.display = 'flex';
-      // إخفاء بعد أول تفاعل أو بعد مهلة قصيرة
-      const hide = ()=> { splash.classList.add('fade-out'); setTimeout(()=>{ splash.style.display='none'; }, 600); document.removeEventListener('click', hide); };
-      setTimeout(hide, 1400);
+      // زر تخطي اختياري إن وجد
+      const skipBtn = document.getElementById('splashSkip');
+      const hide = ()=> { splash.classList.add('fade-out'); setTimeout(()=>{ splash.style.display='none'; }, 600); document.removeEventListener('click', hide); if (skipBtn) skipBtn.removeEventListener('click', hide); };
+      setTimeout(hide, 1500);
       document.addEventListener('click', hide);
+      if (skipBtn) skipBtn.addEventListener('click', function(e){ e.stopPropagation(); hide(); });
     } catch(_) {}
+  });
+
+  // تشغيل دليل الاستخدام أول مرة
+  document.addEventListener('DOMContentLoaded', function(){
+    try {
+      const btn = document.getElementById('openQuickHelp');
+      const modalEl = document.getElementById('quickHelpModal');
+      if (!btn || !modalEl) return;
+      btn.addEventListener('click', function(){
+        const m = new bootstrap.Modal(modalEl); m.show();
+      });
+      const seen = localStorage.getItem('seenQuickHelp');
+      if (!seen) {
+        setTimeout(()=>{ try{ const m = new bootstrap.Modal(modalEl); m.show(); }catch(_){}} , 1200);
+      }
+      modalEl.addEventListener('hidden.bs.modal', function(){
+        const dont = document.getElementById('dontShowHelp');
+        if (dont && dont.checked) localStorage.setItem('seenQuickHelp', '1');
+      });
+    } catch(_){}
   });
 }

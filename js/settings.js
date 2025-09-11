@@ -16,7 +16,7 @@
     const defaultSettings = {
         // إعدادات العرض والمظهر
         display: {
-            theme: 'dark',               // المظهر: light | dark | auto - الافتراضي داكن
+            theme: 'auto',               // المظهر: light | dark | auto - الافتراضي تلقائي
             fontSize: 'medium',          // حجم الخط: tiny | small | medium | large | xlarge | huge | massive
             fontWeight: 'normal',        // وزن الخط: thin | light | normal | medium | semibold | bold | extrabold | black
             fontStyle: 'normal',         // نمط الخط: normal | italic

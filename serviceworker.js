@@ -46,6 +46,7 @@ const CRITICAL_ASSETS = [
   './js/storage.js',
   './js/backup.js',
   './js/backupManager.js',
+  './js/backupSystem.js',
   './js/storeFilter.js',
   './js/expensesTypes.js',
   './js/trash.js',

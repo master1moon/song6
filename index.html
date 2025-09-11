@@ -25,6 +25,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/ar.min.js"></script>
+    <style>
+        .help-fab{position:fixed;bottom:20px;right:20px;z-index:1050}
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -1887,6 +1890,7 @@
             <img id="splashLogo" src="./icons/icon-128.png" alt="شعار التطبيق">
             <div id="splashTitle">نظام كروت الشبكات</div>
             <div id="splashRights"></div>
+            <button id="splashSkip" class="btn btn-sm btn-outline-light mt-3">تخطي</button>
         </div>
     </div>
     <!-- شريط علوي للجوال مع زر القائمة -->
@@ -3027,6 +3031,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal دليل الاستخدام المختصر -->
+    <div class="modal fade" id="quickHelpModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">دليل سريع</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="mb-0">
+                        <li>إضافة بيع سريعًا: من لوحة التحكم اضغط "إضافة بيع".</li>
+                        <li>تسديد دفعة: من تفاصيل المحل اضغط "تسديد دفعة".</li>
+                        <li>تصدير التقارير: من صفحة التقارير اختر الصيغة المناسبة.</li>
+                        <li>تبديل النسق: من الإعدادات ⇢ المظهر اختر فاتح/داكن/تلقائي.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-check me-auto">
+                        <input class="form-check-input" type="checkbox" id="dontShowHelp">
+                        <label class="form-check-label" for="dontShowHelp">لا تُظهر مرة أخرى</label>
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- زر مساعدة عائم -->
+    <button type="button" class="btn btn-primary help-fab" id="openQuickHelp"><i class="fas fa-question"></i></button>
 
     <!-- Modal اختيار المحل للاختصارات -->
     <div class="modal fade" id="selectStoreModal" tabindex="-1" aria-hidden="true">
