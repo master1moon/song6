@@ -1,0 +1,152 @@
+name: 🚀 Build Android APK - إدارة كروت الشبكة
+
+on:
+  push:
+    branches: [ main, cursor/* ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'نوع البناء'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+        - debug
+        - release
+
+jobs:
+  build-apk:
+    name: 📱 بناء APK أندرويد
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 تحميل الكود
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: ☕ إعداد Java 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: 🛠️ إعداد Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 34
+        build-tools: 34.0.0
+
+    - name: 📦 تخزين مؤقت Gradle
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: 🔧 تحديث صلاحيات Gradle
+      run: |
+        cd android-app
+        chmod +x gradlew
+        ls -la gradlew
+
+    - name: 🏗️ بناء APK Debug
+      if: github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == ''
+      run: |
+        cd android-app
+        ./gradlew assembleDebug --stacktrace --info
+        echo "✅ تم بناء APK Debug بنجاح!"
+
+    - name: 🏗️ بناء APK Release
+      if: github.event.inputs.build_type == 'release'
+      run: |
+        cd android-app
+        ./gradlew assembleRelease --stacktrace --info
+        echo "✅ تم بناء APK Release بنجاح!"
+
+    - name: 📋 عرض معلومات APK
+      run: |
+        cd android-app
+        echo "🔍 البحث عن ملفات APK..."
+        find . -name "*.apk" -type f -exec ls -lah {} \;
+        
+        echo ""
+        echo "📊 تفاصيل ملفات APK:"
+        for apk in $(find . -name "*.apk" -type f); do
+          echo "📱 الملف: $apk"
+          echo "📏 الحجم: $(du -h "$apk" | cut -f1)"
+          echo "🕒 التاريخ: $(stat -c %y "$apk")"
+          echo "---"
+        done
+
+    - name: 🎯 رفع APK Debug كـ Artifact
+      if: github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: NetworkCardsManager-Debug-APK
+        path: android-app/app/build/outputs/apk/debug/*.apk
+        retention-days: 30
+
+    - name: 🎯 رفع APK Release كـ Artifact
+      if: github.event.inputs.build_type == 'release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: NetworkCardsManager-Release-APK
+        path: android-app/app/build/outputs/apk/release/*.apk
+        retention-days: 90
+
+    - name: 📊 إنشاء تقرير البناء
+      run: |
+        cd android-app
+        echo "# 🎉 تقرير بناء APK - إدارة كروت الشبكة" > build-report.md
+        echo "" >> build-report.md
+        echo "## 📱 معلومات البناء:" >> build-report.md
+        echo "- 🕒 تاريخ البناء: $(date)" >> build-report.md
+        echo "- 🔧 نوع البناء: ${{ github.event.inputs.build_type || 'debug' }}" >> build-report.md
+        echo "- 🌿 الفرع: ${{ github.ref_name }}" >> build-report.md
+        echo "- 📝 Commit: ${{ github.sha }}" >> build-report.md
+        echo "" >> build-report.md
+        
+        echo "## 📦 ملفات APK المُنشأة:" >> build-report.md
+        for apk in $(find . -name "*.apk" -type f); do
+          filename=$(basename "$apk")
+          size=$(du -h "$apk" | cut -f1)
+          echo "- 📱 **$filename** ($size)" >> build-report.md
+        done
+        
+        echo "" >> build-report.md
+        echo "## 🚀 كيفية التحميل:" >> build-report.md
+        echo "1. اذهب إلى تبويب **Actions** في GitHub" >> build-report.md
+        echo "2. اختر آخر build ناجح" >> build-report.md
+        echo "3. حمّل الـ Artifact من الأسفل" >> build-report.md
+        echo "4. فك الضغط واحصل على ملف APK" >> build-report.md
+        echo "" >> build-report.md
+        echo "## 📱 كيفية التثبيت:" >> build-report.md
+        echo "1. انقل APK لجهاز أندرويد" >> build-report.md
+        echo "2. فعّل 'مصادر غير معروفة' في الإعدادات" >> build-report.md
+        echo "3. اضغط على APK للتثبيت" >> build-report.md
+        echo "4. اتبع التعليمات" >> build-report.md
+        
+        cat build-report.md
+
+    - name: 📊 رفع تقرير البناء
+      uses: actions/upload-artifact@v4
+      with:
+        name: Build-Report
+        path: android-app/build-report.md
+        retention-days: 30
+
+    - name: 🎊 خلاصة النجاح
+      run: |
+        echo "🎉 تم بناء APK بنجاح!"
+        echo "📱 التطبيق: إدارة كروت الشبكة اللاسلكية"
+        echo "🔧 النوع: ${{ github.event.inputs.build_type || 'debug' }}"
+        echo "📅 التاريخ: $(date)"
+        echo ""
+        echo "✅ يمكنك تحميل APK من تبويب Actions → Artifacts"
+        echo "🚀 APK جاهز للتثبيت على أجهزة أندرويد!"
