@@ -34,6 +34,24 @@
  */
 function renderPackagesTable() {
   const table = document.getElementById('packagesTable');
+  if (!table) return;
+  
+  // إظهار تحميل هيكلي للجداول الكبيرة
+  if (data.packages.length > 10 && typeof window.showTableLoading === 'function') {
+    window.showTableLoading(table, 5);
+    
+    // تأخير صغير للعرض السلس
+    setTimeout(() => {
+      renderPackagesTableContent();
+    }, 300);
+    return;
+  }
+  
+  renderPackagesTableContent();
+}
+
+function renderPackagesTableContent() {
+  const table = document.getElementById('packagesTable');
   if (!table) return; 
   
   // استخدام Virtual Scrolling للجداول الكبيرة (أكثر من 50 عنصر)

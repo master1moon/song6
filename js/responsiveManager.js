@@ -225,10 +225,13 @@ class ResponsiveManager {
     const sidebar = document.querySelector('.sidebar');
     if (!sidebar) return;
     
-    if (this.currentBreakpoint === 'xs') {
+    if (this.currentBreakpoint === 'xs' || this.currentBreakpoint === 'sm') {
       // في الهواتف - تبديل القائمة المنبثقة
       this.mobileMenuOpen = !this.mobileMenuOpen;
-      sidebar.classList.toggle('menu-open', this.mobileMenuOpen);
+      sidebar.classList.toggle('mobile-open', this.mobileMenuOpen);
+      
+      // إضافة/إزالة backdrop
+      this.toggleMobileBackdrop();
     } else {
       // في الشاشات الكبيرة - طي الشريط الجانبي
       this.sidebarCollapsed = !this.sidebarCollapsed;
@@ -240,6 +243,36 @@ class ResponsiveManager {
     
     // تحديث أيقونة الزر
     this.updateToggleButtonIcon();
+  }
+
+  /**
+   * تبديل خلفية الهاتف المحمول
+   */
+  toggleMobileBackdrop() {
+    let backdrop = document.querySelector('.sidebar-backdrop');
+    
+    if (this.mobileMenuOpen) {
+      if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.className = 'sidebar-backdrop';
+        backdrop.addEventListener('click', () => {
+          this.toggleSidebar();
+        });
+        document.body.appendChild(backdrop);
+      }
+      
+      // إظهار backdrop
+      setTimeout(() => {
+        backdrop.classList.add('show');
+      }, 10);
+    } else {
+      if (backdrop) {
+        backdrop.classList.remove('show');
+        setTimeout(() => {
+          backdrop.remove();
+        }, 300);
+      }
+    }
   }
 
   /**

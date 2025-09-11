@@ -420,29 +420,98 @@ class AnimationManager {
    * إضافة الرسوم المتحركة العامة
    */
   addGlobalAnimations() {
-    // تحريك الكروت
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
+    // تحريك الكروت مع تأخير متدرج
+    const cards = document.querySelectorAll('.card, .section-content, .stat-box');
+    cards.forEach((card, index) => {
       card.classList.add('card-animated', 'hover-lift');
+      
+      // تأثير الظهور المتدرج
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      
+      setTimeout(() => {
+        card.style.transition = 'all 0.4s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, index * 100);
     });
     
     // تحريك الأزرار
     const buttons = document.querySelectorAll('.btn');
     buttons.forEach(btn => {
-      btn.classList.add('btn-animated');
+      btn.classList.add('btn-animated', 'hover-scale');
       this.addRippleEffect(btn);
     });
     
-    // تحريك عناصر القائمة
-    const listItems = document.querySelectorAll('.nav-link, .list-group-item');
-    listItems.forEach(item => {
-      item.classList.add('list-item-animated');
+    // تحريك عناصر القائمة الجانبية
+    const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    navLinks.forEach((link, index) => {
+      link.classList.add('list-item-animated');
+      
+      // تأثير الظهور المتدرج للقائمة
+      link.style.opacity = '0';
+      link.style.transform = 'translateX(-20px)';
+      
+      setTimeout(() => {
+        link.style.transition = 'all 0.3s ease';
+        link.style.opacity = '1';
+        link.style.transform = 'translateX(0)';
+      }, index * 50 + 200);
     });
     
     // تحريك حقول النماذج
     const formGroups = document.querySelectorAll('.form-group');
     formGroups.forEach(group => {
       group.classList.add('form-group-animated');
+    });
+    
+    // تحريك عناصر القوائم
+    const listItems = document.querySelectorAll('.list-group-item');
+    listItems.forEach(item => {
+      item.classList.add('list-item-animated', 'hover-lift');
+    });
+    
+    // تحريك الجداول
+    const tables = document.querySelectorAll('.table');
+    tables.forEach(table => {
+      table.classList.add('table-animated');
+      
+      // تحريك الصفوف عند التحميل
+      const rows = table.querySelectorAll('tbody tr');
+      rows.forEach((row, index) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(20px)';
+        
+        setTimeout(() => {
+          row.style.transition = 'all 0.3s ease';
+          row.style.opacity = '1';
+          row.style.transform = 'translateX(0)';
+        }, index * 30);
+      });
+    });
+    
+    // تحريك الإحصائيات
+    this.animateCounters();
+  }
+
+  /**
+   * تحريك العدادات الرقمية
+   */
+  animateCounters() {
+    const counters = document.querySelectorAll('.stat-value, [data-animate-counter]');
+    
+    counters.forEach((counter, index) => {
+      const targetValue = parseInt(counter.textContent.replace(/[^\d]/g, '')) || 0;
+      
+      if (targetValue > 0) {
+        // إعادة تعيين القيمة إلى الصفر
+        counter.textContent = '0';
+        
+        // بدء التحريك بعد تأخير
+        setTimeout(() => {
+          this.animateCounter(counter, targetValue, 1500);
+        }, index * 200 + 500);
+      }
     });
   }
 

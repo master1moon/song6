@@ -1,0 +1,718 @@
+/**
+ * نظام Material Design للتطبيق
+ * يطبق مبادئ Material Design من Google
+ */
+
+/* ===== المتغيرات الأساسية ===== */
+:root {
+  /* الألوان الأساسية */
+  --md-primary: #1976d2;
+  --md-primary-variant: #1565c0;
+  --md-secondary: #03dac6;
+  --md-secondary-variant: #018786;
+  --md-error: #b00020;
+  --md-warning: #ff9800;
+  --md-success: #4caf50;
+  --md-info: #2196f3;
+  
+  /* الألوان السطحية */
+  --md-surface: #ffffff;
+  --md-background: #fafafa;
+  --md-surface-variant: #f5f5f5;
+  
+  /* ألوان النص */
+  --md-on-primary: #ffffff;
+  --md-on-secondary: #000000;
+  --md-on-surface: #000000;
+  --md-on-background: #000000;
+  --md-on-error: #ffffff;
+  
+  /* الظلال */
+  --md-elevation-0: none;
+  --md-elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  --md-elevation-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  --md-elevation-3: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  --md-elevation-4: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  --md-elevation-5: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+  
+  /* الخطوط */
+  --md-font-family: 'Roboto', 'Tajawal', 'Segoe UI', sans-serif;
+  --md-font-weight-light: 300;
+  --md-font-weight-regular: 400;
+  --md-font-weight-medium: 500;
+  --md-font-weight-bold: 700;
+  
+  /* أحجام الخطوط */
+  --md-text-h1: 6rem;
+  --md-text-h2: 3.75rem;
+  --md-text-h3: 3rem;
+  --md-text-h4: 2.125rem;
+  --md-text-h5: 1.5rem;
+  --md-text-h6: 1.25rem;
+  --md-text-subtitle1: 1rem;
+  --md-text-subtitle2: 0.875rem;
+  --md-text-body1: 1rem;
+  --md-text-body2: 0.875rem;
+  --md-text-button: 0.875rem;
+  --md-text-caption: 0.75rem;
+  --md-text-overline: 0.75rem;
+  
+  /* المسافات */
+  --md-spacing-xs: 4px;
+  --md-spacing-sm: 8px;
+  --md-spacing-md: 16px;
+  --md-spacing-lg: 24px;
+  --md-spacing-xl: 32px;
+  --md-spacing-xxl: 48px;
+  
+  /* الانتقالات */
+  --md-transition-standard: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --md-transition-decelerated: 400ms cubic-bezier(0, 0, 0.2, 1);
+  --md-transition-accelerated: 200ms cubic-bezier(0.4, 0, 1, 1);
+  
+  /* الزوايا المدورة */
+  --md-shape-corner-xs: 4px;
+  --md-shape-corner-sm: 8px;
+  --md-shape-corner-md: 12px;
+  --md-shape-corner-lg: 16px;
+  --md-shape-corner-xl: 28px;
+}
+
+/* ===== الوضع المظلم ===== */
+.dark-theme {
+  --md-primary: #bb86fc;
+  --md-primary-variant: #3700b3;
+  --md-secondary: #03dac6;
+  --md-secondary-variant: #03dac6;
+  --md-error: #cf6679;
+  
+  --md-surface: #121212;
+  --md-background: #000000;
+  --md-surface-variant: #1e1e1e;
+  
+  --md-on-primary: #000000;
+  --md-on-secondary: #000000;
+  --md-on-surface: #ffffff;
+  --md-on-background: #ffffff;
+  --md-on-error: #000000;
+}
+
+/* ===== التصميم الأساسي ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--md-font-family);
+  background-color: var(--md-background);
+  color: var(--md-on-background);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== الأزرار المادية ===== */
+.btn-material {
+  font-family: var(--md-font-family);
+  font-size: var(--md-text-button);
+  font-weight: var(--md-font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.0892857143em;
+  border-radius: var(--md-shape-corner-xs);
+  padding: 10px 24px;
+  min-width: 64px;
+  height: 36px;
+  border: none;
+  cursor: pointer;
+  transition: all var(--md-transition-standard);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  outline: none;
+}
+
+/* الزر الأساسي */
+.btn-material.btn-primary {
+  background-color: var(--md-primary);
+  color: var(--md-on-primary);
+  box-shadow: var(--md-elevation-2);
+}
+
+.btn-material.btn-primary:hover {
+  background-color: var(--md-primary-variant);
+  box-shadow: var(--md-elevation-4);
+}
+
+.btn-material.btn-primary:active {
+  box-shadow: var(--md-elevation-5);
+}
+
+/* الزر المحدد */
+.btn-material.btn-outlined {
+  background-color: transparent;
+  color: var(--md-primary);
+  border: 1px solid var(--md-primary);
+  box-shadow: none;
+}
+
+.btn-material.btn-outlined:hover {
+  background-color: rgba(25, 118, 210, 0.04);
+}
+
+/* الزر النصي */
+.btn-material.btn-text {
+  background-color: transparent;
+  color: var(--md-primary);
+  box-shadow: none;
+  min-width: auto;
+  padding: 10px 8px;
+}
+
+.btn-material.btn-text:hover {
+  background-color: rgba(25, 118, 210, 0.04);
+}
+
+/* الزر العائم */
+.btn-material.btn-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  min-width: auto;
+  padding: 0;
+  background-color: var(--md-secondary);
+  color: var(--md-on-secondary);
+  box-shadow: var(--md-elevation-3);
+}
+
+.btn-material.btn-fab:hover {
+  box-shadow: var(--md-elevation-4);
+}
+
+.btn-material.btn-fab.btn-fab-mini {
+  width: 40px;
+  height: 40px;
+}
+
+/* تأثير الموجة */
+.btn-material::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-material:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* ===== الكروت المادية ===== */
+.card-material {
+  background-color: var(--md-surface);
+  color: var(--md-on-surface);
+  border-radius: var(--md-shape-corner-sm);
+  box-shadow: var(--md-elevation-1);
+  transition: box-shadow var(--md-transition-standard);
+  overflow: hidden;
+}
+
+.card-material:hover {
+  box-shadow: var(--md-elevation-2);
+}
+
+.card-material.card-elevated {
+  box-shadow: var(--md-elevation-3);
+}
+
+.card-material.card-elevated:hover {
+  box-shadow: var(--md-elevation-4);
+}
+
+.card-material-header {
+  padding: var(--md-spacing-md);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.card-material-content {
+  padding: var(--md-spacing-md);
+}
+
+.card-material-actions {
+  padding: var(--md-spacing-sm) var(--md-spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--md-spacing-sm);
+}
+
+/* ===== حقول الإدخال المادية ===== */
+.input-material {
+  position: relative;
+  margin-bottom: var(--md-spacing-lg);
+}
+
+.input-material input,
+.input-material textarea,
+.input-material select {
+  width: 100%;
+  padding: 12px 16px 12px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: var(--md-shape-corner-xs);
+  background-color: transparent;
+  color: var(--md-on-surface);
+  font-size: var(--md-text-body1);
+  transition: all var(--md-transition-standard);
+  outline: none;
+}
+
+.input-material input:focus,
+.input-material textarea:focus,
+.input-material select:focus {
+  border-color: var(--md-primary);
+  border-width: 2px;
+  padding: 11px 15px 11px 15px;
+}
+
+.input-material label {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: var(--md-text-body1);
+  transition: all var(--md-transition-standard);
+  pointer-events: none;
+  background-color: var(--md-surface);
+  padding: 0 4px;
+}
+
+.input-material input:focus + label,
+.input-material input:not(:placeholder-shown) + label,
+.input-material textarea:focus + label,
+.input-material textarea:not(:placeholder-shown) + label,
+.input-material select:focus + label,
+.input-material select:not([value=""]) + label {
+  top: -6px;
+  font-size: var(--md-text-caption);
+  color: var(--md-primary);
+}
+
+/* ===== التبويبات المادية ===== */
+.tabs-material {
+  display: flex;
+  background-color: var(--md-surface);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  position: relative;
+}
+
+.tab-material {
+  flex: 1;
+  padding: 12px 16px;
+  text-align: center;
+  background: none;
+  border: none;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: var(--md-text-button);
+  font-weight: var(--md-font-weight-medium);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--md-transition-standard);
+  position: relative;
+}
+
+.tab-material:hover {
+  color: var(--md-primary);
+  background-color: rgba(25, 118, 210, 0.04);
+}
+
+.tab-material.active {
+  color: var(--md-primary);
+}
+
+.tab-material.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--md-primary);
+}
+
+/* ===== القوائم المنسدلة المادية ===== */
+.dropdown-material {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-material-content {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 200px;
+  background-color: var(--md-surface);
+  border-radius: var(--md-shape-corner-sm);
+  box-shadow: var(--md-elevation-3);
+  z-index: 1000;
+  opacity: 0;
+  transform: scale(0.8) translateY(-10px);
+  transition: all var(--md-transition-decelerated);
+  pointer-events: none;
+}
+
+.dropdown-material.active .dropdown-material-content {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: all;
+}
+
+.dropdown-material-item {
+  padding: 12px 16px;
+  color: var(--md-on-surface);
+  text-decoration: none;
+  display: block;
+  transition: background-color var(--md-transition-standard);
+}
+
+.dropdown-material-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* ===== الرقائق (Chips) ===== */
+.chip-material {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background-color: rgba(0, 0, 0, 0.08);
+  color: var(--md-on-surface);
+  font-size: var(--md-text-body2);
+  transition: all var(--md-transition-standard);
+  cursor: pointer;
+  margin: 2px;
+}
+
+.chip-material:hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.chip-material.chip-selected {
+  background-color: var(--md-primary);
+  color: var(--md-on-primary);
+}
+
+.chip-material .chip-icon {
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  border-radius: 50%;
+}
+
+.chip-material .chip-delete {
+  margin-right: -6px;
+  margin-left: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.26);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+/* ===== شرائط التقدم المادية ===== */
+.progress-material {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(25, 118, 210, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-material-bar {
+  height: 100%;
+  background-color: var(--md-primary);
+  border-radius: 2px;
+  transition: width var(--md-transition-standard);
+}
+
+.progress-material.indeterminate .progress-material-bar {
+  width: 30%;
+  animation: indeterminate 2s infinite;
+}
+
+@keyframes indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* ===== المفاتيح (Switches) ===== */
+.switch-material {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 14px;
+}
+
+.switch-material input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-material-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.38);
+  border-radius: 7px;
+  transition: var(--md-transition-standard);
+}
+
+.switch-material-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: -3px;
+  top: -3px;
+  background-color: #fafafa;
+  border-radius: 50%;
+  box-shadow: var(--md-elevation-1);
+  transition: var(--md-transition-standard);
+}
+
+.switch-material input:checked + .switch-material-slider {
+  background-color: rgba(25, 118, 210, 0.5);
+}
+
+.switch-material input:checked + .switch-material-slider:before {
+  background-color: var(--md-primary);
+  transform: translateX(20px);
+}
+
+/* ===== الإشعارات المادية ===== */
+.snackbar-material {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background-color: #323232;
+  color: white;
+  padding: 14px 24px;
+  border-radius: var(--md-shape-corner-xs);
+  box-shadow: var(--md-elevation-3);
+  z-index: 1000;
+  transition: transform var(--md-transition-decelerated);
+  min-width: 288px;
+  max-width: 568px;
+}
+
+.snackbar-material.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+.snackbar-material .snackbar-action {
+  background: none;
+  border: none;
+  color: var(--md-secondary);
+  font-weight: var(--md-font-weight-medium);
+  text-transform: uppercase;
+  margin-right: -8px;
+  margin-left: 24px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+/* ===== أشرطة التطبيق ===== */
+.app-bar-material {
+  background-color: var(--md-primary);
+  color: var(--md-on-primary);
+  box-shadow: var(--md-elevation-2);
+  padding: 0 16px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.app-bar-material h1,
+.app-bar-material h2,
+.app-bar-material h3 {
+  margin: 0;
+  font-size: var(--md-text-h6);
+  font-weight: var(--md-font-weight-medium);
+  flex: 1;
+}
+
+.app-bar-material .app-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--md-spacing-sm);
+}
+
+/* ===== القوائم المادية ===== */
+.list-material {
+  background-color: var(--md-surface);
+  padding: 8px 0;
+}
+
+.list-item-material {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color var(--md-transition-standard);
+  min-height: 48px;
+}
+
+.list-item-material:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.list-item-material .list-item-icon {
+  width: 24px;
+  height: 24px;
+  margin-left: 32px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.list-item-material .list-item-content {
+  flex: 1;
+}
+
+.list-item-material .list-item-title {
+  font-size: var(--md-text-body1);
+  font-weight: var(--md-font-weight-regular);
+  margin: 0;
+}
+
+.list-item-material .list-item-subtitle {
+  font-size: var(--md-text-body2);
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+}
+
+/* ===== الأيقونات المادية ===== */
+.icon-material {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  fill: currentColor;
+}
+
+.icon-material.size-small {
+  width: 18px;
+  height: 18px;
+}
+
+.icon-material.size-large {
+  width: 32px;
+  height: 32px;
+}
+
+/* ===== الفواصل ===== */
+.divider-material {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.12);
+  margin: 8px 0;
+}
+
+.divider-material.vertical {
+  width: 1px;
+  height: auto;
+  margin: 0 8px;
+}
+
+/* ===== تحسينات الوضع المظلم ===== */
+.dark-theme .input-material input,
+.dark-theme .input-material textarea,
+.dark-theme .input-material select {
+  border-color: rgba(255, 255, 255, 0.38);
+  color: var(--md-on-surface);
+}
+
+.dark-theme .input-material label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dark-theme .tabs-material {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark-theme .tab-material {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dark-theme .chip-material {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark-theme .chip-material:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark-theme .list-item-material:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.dark-theme .divider-material {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ===== الاستجابة للأجهزة المحمولة ===== */
+@media (max-width: 768px) {
+  .btn-material {
+    min-width: 48px;
+    height: 48px;
+  }
+  
+  .app-bar-material {
+    height: 48px;
+  }
+  
+  .list-item-material {
+    min-height: 56px;
+    padding: 16px;
+  }
+}
+
+/* ===== تحسينات الأداء ===== */
+.btn-material,
+.card-material,
+.input-material input,
+.switch-material-slider {
+  will-change: transform, opacity;
+}
+
+/* تحسينات إمكانية الوصول */
+@media (prefers-reduced-motion: reduce) {
+  .btn-material,
+  .card-material,
+  .input-material input,
+  .switch-material-slider,
+  .snackbar-material,
+  .dropdown-material-content {
+    transition: none;
+  }
+  
+  .progress-material.indeterminate .progress-material-bar {
+    animation: none;
+  }
+}

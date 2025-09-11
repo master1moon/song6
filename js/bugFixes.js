@@ -164,7 +164,12 @@ if (typeof parseFormattedNumber === 'undefined') {
  */
 if (typeof showNotification === 'undefined') {
   window.showNotification = function(message, type = 'info', duration = 5000) {
-    // إنشاء عنصر الإشعار
+    // استخدام Snackbar Material إذا كان متاحاً
+    if (typeof window.showSnackbar === 'function') {
+      return window.showSnackbar(message, null, null, duration);
+    }
+    
+    // إنشاء عنصر الإشعار المحسن
     const notification = document.createElement('div');
     notification.className = `alert alert-${getBootstrapAlertType(type)} alert-dismissible fade show notification-toast`;
     notification.style.cssText = `
@@ -174,7 +179,8 @@ if (typeof showNotification === 'undefined') {
       z-index: 9999;
       min-width: 300px;
       max-width: 500px;
-      animation: slideInRight 0.3s ease-out;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     `;
     
     notification.innerHTML = `
@@ -185,15 +191,24 @@ if (typeof showNotification === 'undefined') {
     // إضافة للصفحة
     document.body.appendChild(notification);
     
-    // إزالة تلقائية
+    // تأثير الدخول
+    if (typeof window.animateNotification === 'function') {
+      window.animateNotification(notification, 'enter');
+    }
+    
+    // إزالة تلقائية مع تأثير
     setTimeout(() => {
       if (notification.parentNode) {
-        notification.classList.remove('show');
-        setTimeout(() => {
-          if (notification.parentNode) {
-            notification.remove();
-          }
-        }, 300);
+        if (typeof window.animateNotification === 'function') {
+          window.animateNotification(notification, 'exit');
+        } else {
+          notification.classList.remove('show');
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.remove();
+            }
+          }, 300);
+        }
       }
     }, duration);
     

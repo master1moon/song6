@@ -70,7 +70,61 @@
             min-width: 250px;
             padding: 0;
             box-shadow: 3px 0 10px rgba(0,0,0,0.1);
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1000;
+        }
+        
+        /* الشريط الجانبي المطوي */
+        .sidebar.collapsed {
+            min-width: 60px;
+            overflow: hidden;
+        }
+        
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .logo h3 {
+            font-size: 0;
+            opacity: 0;
+        }
+        
+        /* الشريط الجانبي للهواتف */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                z-index: 1050;
+                transition: right 0.3s ease;
+            }
+            
+            .sidebar.mobile-open {
+                right: 0;
+            }
+            
+            .sidebar-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
+            
+            .sidebar-backdrop.show {
+                opacity: 1;
+                pointer-events: all;
+            }
         }
         
         .sidebar .logo {
@@ -1986,6 +2040,15 @@
                     </button>
                     <button type="button" class="btn btn-outline-secondary ms-2 d-none" data-bs-toggle="modal" data-bs-target="#backupManagerModal">
                         <i class="fas fa-database me-1"></i> النسخ الاحتياطي
+                    </button>
+                    <!-- زر تبديل الثيم -->
+                    <button id="themeToggle" class="btn btn-outline-secondary ms-2" onclick="toggleTheme()" title="تبديل الوضع المظلم/الفاتح">
+                        <i class="fas fa-moon"></i>
+                        <span class="d-none d-lg-inline ms-2">مظلم</span>
+                    </button>
+                    <!-- زر طي القائمة الجانبية -->
+                    <button id="sidebarToggle" class="btn btn-outline-secondary ms-2 d-lg-none" onclick="toggleSidebar()" title="إظهار/إخفاء القائمة">
+                        <i class="fas fa-bars"></i>
                     </button>
                 </div>
             </div>
@@ -6355,6 +6418,28 @@
     
     <!-- نظام اختبار الأداء -->
     <script src="js/performanceTest.js"></script>
+    
+    <!-- 🎨 التحسينات المرئية والتفاعلية الجديدة -->
+    
+    <!-- نظام الثيمات (Dark/Light Mode) -->
+    <script src="js/themeManager.js"></script>
+    
+    <!-- التصميم المتجاوب المحسن -->
+    <link href="css/enhanced-responsive.css" rel="stylesheet">
+    <script src="js/responsiveManager.js"></script>
+    
+    <!-- نظام الرسوم المتحركة -->
+    <script src="js/animationManager.js"></script>
+    
+    <!-- نظام Material Design -->
+    <link href="css/material-design.css" rel="stylesheet">
+    <script src="js/materialDesign.js"></script>
+    
+    <!-- نظام حالات التحميل -->
+    <script src="js/loadingStates.js"></script>
+    
+    <!-- مدير التحسينات المرئية الشامل -->
+    <script src="js/uiEnhancementsManager.js"></script>
     
     <script>
     // حل احتياطي: دالة بسيطة لعرض تعليمات Google Drive - متاحة فوراً
