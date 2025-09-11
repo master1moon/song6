@@ -1,0 +1,146 @@
+name: 📱 بناء APK بسيط (مضمون)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'نوع البناء'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+        - debug
+        - release
+
+jobs:
+  build-simple:
+    name: 🔧 بناء APK مضمون
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 تحميل الكود
+      uses: actions/checkout@v4
+
+    - name: ☕ إعداد Java 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: 🔧 إعداد Android SDK (بديل)
+      run: |
+        echo "📦 تحميل Android SDK..."
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+        unzip -q commandlinetools-linux-9477386_latest.zip
+        
+        echo "📁 إعداد مجلدات SDK..."
+        mkdir -p android-sdk/cmdline-tools
+        mv cmdline-tools android-sdk/cmdline-tools/latest
+        
+        echo "🔧 إعداد متغيرات البيئة..."
+        export ANDROID_HOME=$PWD/android-sdk
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+        export PATH=$PATH:$ANDROID_HOME/platform-tools
+        
+        echo "ANDROID_HOME=$PWD/android-sdk" >> $GITHUB_ENV
+        echo "$PWD/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        echo "$PWD/android-sdk/platform-tools" >> $GITHUB_PATH
+        
+        echo "📋 قبول التراخيص..."
+        yes | sdkmanager --licenses || true
+        
+        echo "📦 تثبيت المكونات المطلوبة..."
+        sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
+        
+        echo "✅ تم إعداد Android SDK بنجاح!"
+
+    - name: 🔍 فحص مشروع Android
+      run: |
+        cd android-app
+        echo "📋 محتويات مشروع Android:"
+        ls -la
+        
+        echo "🔧 فحص ملف gradlew..."
+        if [ -f "gradlew" ]; then
+          chmod +x gradlew
+          echo "✅ gradlew موجود وجاهز"
+        else
+          echo "❌ gradlew غير موجود!"
+          exit 1
+        fi
+        
+        echo "📋 فحص ملف build.gradle..."
+        if [ -f "app/build.gradle" ]; then
+          echo "✅ build.gradle موجود"
+          head -20 app/build.gradle
+        else
+          echo "❌ build.gradle غير موجود!"
+          exit 1
+        fi
+
+    - name: 🏗️ بناء APK
+      run: |
+        cd android-app
+        
+        echo "🔧 إعداد Gradle..."
+        ./gradlew --version
+        
+        BUILD_TYPE="${{ github.event.inputs.build_type || 'debug' }}"
+        echo "🏗️ بناء APK نوع: $BUILD_TYPE"
+        
+        if [ "$BUILD_TYPE" = "release" ]; then
+          echo "🏗️ بناء Release APK..."
+          ./gradlew clean assembleRelease --stacktrace --no-daemon
+        else
+          echo "🏗️ بناء Debug APK..."
+          ./gradlew clean assembleDebug --stacktrace --no-daemon
+        fi
+        
+        echo "✅ تم بناء APK بنجاح!"
+
+    - name: 📋 فحص النتائج
+      run: |
+        cd android-app
+        
+        echo "🔍 البحث عن ملفات APK..."
+        find . -name "*.apk" -type f -exec ls -lah {} \;
+        
+        echo ""
+        echo "📊 تفاصيل APK:"
+        for apk in $(find . -name "*.apk" -type f); do
+          echo "📱 الملف: $apk"
+          echo "📏 الحجم: $(du -h "$apk" | cut -f1)"
+          echo "🕒 التاريخ: $(stat -c %y "$apk")"
+          echo "---"
+        done
+        
+        # إعادة تسمية APK للوضوح
+        BUILD_TYPE="${{ github.event.inputs.build_type || 'debug' }}"
+        APK_PATH=$(find . -name "*${BUILD_TYPE}.apk" | head -1)
+        
+        if [ -n "$APK_PATH" ]; then
+          NEW_NAME="NetworkCardsManager-${BUILD_TYPE}-$(date +%Y%m%d-%H%M).apk"
+          cp "$APK_PATH" "$NEW_NAME"
+          echo "📱 APK النهائي: $NEW_NAME"
+          echo "APK_NAME=$NEW_NAME" >> $GITHUB_ENV
+        fi
+
+    - name: 📤 رفع APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: NetworkCardsManager-${{ github.event.inputs.build_type || 'debug' }}-APK
+        path: android-app/*.apk
+        retention-days: 30
+
+    - name: 🎊 النجاح!
+      run: |
+        echo "🎉 تم بناء APK بنجاح!"
+        echo "📱 النوع: ${{ github.event.inputs.build_type || 'debug' }}"
+        echo "📅 التاريخ: $(date)"
+        echo ""
+        echo "📥 كيفية التحميل:"
+        echo "1. اذهب إلى تبويب Actions"
+        echo "2. اختر هذا الـ workflow"
+        echo "3. حمّل الـ Artifact من الأسفل"
+        echo ""
+        echo "🚀 APK جاهز للتثبيت على أندرويد!"
