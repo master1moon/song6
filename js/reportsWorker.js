@@ -36,6 +36,21 @@ self.onmessage = function(e){
       }
       self.postMessage({ ok:true, rows, totals:{ totalDebts } });
       return;
+    } else if (msg.type === 'profit') {
+      const d = msg.payload || {};
+      const fromDate = String(d.fromDate||'0000-01-01').slice(0,10);
+      const toDate = String(d.toDate||'9999-12-31').slice(0,10);
+      function inRange(s){ const dd=(s||'').slice(0,10); return dd>=fromDate && dd<=toDate; }
+      const sales = Array.isArray(d.sales) ? d.sales.filter(x=>inRange(x.date)) : [];
+      const payments = Array.isArray(d.payments) ? d.payments.filter(x=>inRange(x.date)) : [];
+      const expenses = Array.isArray(d.expenses) ? d.expenses.filter(x=>inRange(x.date)) : [];
+      const sum = (arr, k) => arr.reduce((s,x)=> s + (Number(x[k])||0), 0);
+      const totalSales = sum(sales, 'total');
+      const totalPayments = sum(payments, 'amount');
+      const totalExpenses = sum(expenses, 'amount');
+      const netProfit = totalPayments - totalExpenses;
+      self.postMessage({ ok:true, profit:{ totalSales, totalPayments, totalExpenses, netProfit } });
+      return;
     }
     self.postMessage({ ok:false, error:'unknown_type' });
   }catch(err){

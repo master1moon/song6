@@ -146,6 +146,25 @@ async function updateProfitReport() {
   }
   
   const { fromDate, toDate } = getPeriodRange('profit');
+  // محاولة استخدام Web Worker أولاً
+  try {
+    if (window.Worker) {
+      const w = new Worker('./js/reportsWorker.js');
+      w.onmessage = function(ev){
+        const msg = ev.data || {};
+        if (!msg.ok || !msg.profit) { fallbackProfit(); return; }
+        const r = msg.profit;
+        const totalSalesEl = document.getElementById('totalSalesReport'); if (totalSalesEl) totalSalesEl.textContent = formatNumber(r.totalSales);
+        const totalPaymentsEl = document.getElementById('totalPaymentsReport'); if (totalPaymentsEl) totalPaymentsEl.textContent = formatNumber(r.totalPayments);
+        const totalExpensesEl = document.getElementById('totalExpensesReport'); if (totalExpensesEl) totalExpensesEl.textContent = formatNumber(r.totalExpenses);
+        const netProfitElement = document.getElementById('netProfitReport'); if (netProfitElement) netProfitElement.textContent = formatNumber(r.netProfit);
+        w.terminate();
+      };
+      w.onerror = function(){ fallbackProfit(); try{ w.terminate(); }catch{} };
+      w.postMessage({ type:'profit', payload: { fromDate, toDate, sales: data.sales||[], payments: data.payments||[], expenses: data.expenses||[] } });
+      return;
+    }
+  } catch(_) { /* متابعة بالسقوط */ }
   
   /**
    * استخدام الكاش للحصول على بيانات التقرير بسرعة
