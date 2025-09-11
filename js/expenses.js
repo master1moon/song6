@@ -41,6 +41,8 @@ function addExpense() {
   document.getElementById('expenseDate').value = formatDateEn(getTodayDate());
   document.getElementById('addLater').checked = false;
   const modal = new bootstrap.Modal(document.getElementById('expenseModal')); modal.show();
+  // تهيئة تنسيق المدخلات داخل المودال
+  try { if (typeof setupFormattedInputs==='function') setupFormattedInputs(); } catch(_){ }
 }
 
 /**

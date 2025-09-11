@@ -4760,6 +4760,7 @@
             
             
             saveData();
+            try { if (typeof expensesState !== 'undefined') expensesState.page = 1; } catch(_){ }
             renderExpensesTable();
             updateDashboard();
             updateProfitReport();
@@ -6052,7 +6053,48 @@
 
 
     <script>
+    // تهيئة تنسيق الحقول الرقمية وربط تحديث لوحة التحكم
+    document.addEventListener('DOMContentLoaded', function(){
+        // تهيئة تنسيق حقول الأرقام
+        try {
+            if (typeof setupFormattedInputs === 'function') {
+                setupFormattedInputs();
+                // تنسيق مبدئي للقيم الحالية في الحقول المنسقة
+                document.querySelectorAll('.formatted-input').forEach(function(inp){
+                    try{
+                        if (inp && inp.value && typeof parseFormattedNumber==='function' && typeof formatNumber==='function'){
+                            var num = parseFormattedNumber(inp.value);
+                            inp.value = (num || num === 0) ? formatNumber(num) : '';
+                        }
+                    } catch(_){ }
+                });
+            }
+        } catch(_){ }
 
+        // ربط تغيير مدة الحساب في لوحة التحكم
+        try {
+            var periodSel = document.getElementById('dashboardPeriod');
+            if (periodSel && !periodSel.dataset._dashWired) {
+                periodSel.addEventListener('change', function(){
+                    try { if (typeof updateDashboard==='function') updateDashboard(); } catch(_){}
+                    try { if (typeof updateProfitReport==='function') updateProfitReport(); } catch(_){}
+                    try { if (typeof generateDebtReport==='function') generateDebtReport(); } catch(_){}
+                });
+                periodSel.dataset._dashWired = '1';
+            }
+        } catch(_){ }
+
+        // إعادة تهيئة التنسيق عند فتح أي نافذة تحتوي مدخلات أرقام
+        try {
+            ['expenseModal','saleModal','paymentModal','inventoryModal','packageModal','storeModal'].forEach(function(id){
+                var el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('shown.bs.modal', function(){
+                    try{ if (typeof setupFormattedInputs==='function') setupFormattedInputs(); }catch(_){ }
+                });
+            });
+        } catch(_){ }
+    });
     </script>
 
     <!-- Backup Manager Modal -->
