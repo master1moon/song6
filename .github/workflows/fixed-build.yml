@@ -1,0 +1,164 @@
+name: 🛠️ بناء APK (مُصحح Gradle)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'نوع البناء'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+        - debug
+        - release
+
+jobs:
+  build-fixed:
+    name: 🔧 بناء مُصحح
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 تحميل الكود
+      uses: actions/checkout@v4
+
+    - name: ☕ إعداد Java 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: 🔧 إصلاح Gradle Wrapper
+      run: |
+        cd android-app
+        
+        echo "🔍 فحص gradle wrapper الحالي..."
+        ls -la gradle/wrapper/
+        
+        echo "📏 حجم gradle-wrapper.jar:"
+        du -h gradle/wrapper/gradle-wrapper.jar
+        
+        # إذا كان الملف صغير، نحمل واحد صحيح
+        SIZE=$(stat -c%s gradle/wrapper/gradle-wrapper.jar)
+        if [ $SIZE -lt 50000 ]; then
+          echo "⚠️ gradle-wrapper.jar صغير جداً، جاري تحميل نسخة صحيحة..."
+          wget -O gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.4.0/gradle/wrapper/gradle-wrapper.jar
+          echo "✅ تم تحميل gradle-wrapper.jar صحيح"
+        else
+          echo "✅ gradle-wrapper.jar بحجم صحيح"
+        fi
+        
+        echo "📋 تحديث gradle-wrapper.properties..."
+        cat > gradle/wrapper/gradle-wrapper.properties << 'EOF'
+        distributionBase=GRADLE_USER_HOME
+        distributionPath=wrapper/dists
+        distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip
+        networkTimeout=10000
+        validateDistributionUrl=true
+        zipStoreBase=GRADLE_USER_HOME
+        zipStorePath=wrapper/dists
+        EOF
+        
+        echo "🔧 تحديث صلاحيات gradlew..."
+        chmod +x gradlew
+        
+        echo "✅ تم إصلاح Gradle Wrapper!"
+
+    - name: 🛠️ إعداد Android SDK
+      run: |
+        echo "📦 تحميل Android SDK..."
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+        unzip -q commandlinetools-linux-9477386_latest.zip
+        
+        echo "📁 إعداد SDK..."
+        mkdir -p $HOME/android-sdk/cmdline-tools
+        mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+        
+        echo "🔧 إعداد متغيرات البيئة..."
+        export ANDROID_HOME=$HOME/android-sdk
+        export ANDROID_SDK_ROOT=$HOME/android-sdk
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+        export PATH=$PATH:$ANDROID_HOME/platform-tools
+        
+        echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+        echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+        
+        echo "📋 قبول التراخيص..."
+        yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+        
+        echo "📦 تثبيت المكونات..."
+        $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-34"
+        $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0"
+        $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools"
+        
+        echo "✅ تم إعداد Android SDK!"
+
+    - name: 🔍 اختبار Gradle
+      run: |
+        cd android-app
+        
+        echo "🔧 اختبار gradlew..."
+        ./gradlew --version
+        
+        echo "📋 فحص مشروع Android..."
+        ./gradlew tasks --all | head -20
+        
+        echo "✅ Gradle يعمل بنجاح!"
+
+    - name: 🏗️ بناء APK
+      run: |
+        cd android-app
+        
+        BUILD_TYPE="${{ github.event.inputs.build_type || 'debug' }}"
+        echo "🏗️ بناء APK نوع: $BUILD_TYPE"
+        
+        # تنظيف أولاً
+        echo "🧹 تنظيف المشروع..."
+        ./gradlew clean --no-daemon --stacktrace
+        
+        # بناء APK
+        if [ "$BUILD_TYPE" = "release" ]; then
+          echo "🏗️ بناء Release APK..."
+          ./gradlew assembleRelease --no-daemon --stacktrace --info
+        else
+          echo "🏗️ بناء Debug APK..."
+          ./gradlew assembleDebug --no-daemon --stacktrace --info
+        fi
+        
+        echo "✅ تم بناء APK بنجاح!"
+
+    - name: 📋 عرض النتائج
+      run: |
+        cd android-app
+        
+        echo "🔍 البحث عن ملفات APK..."
+        find . -name "*.apk" -type f -exec ls -lah {} \;
+        
+        echo ""
+        echo "📊 تفاصيل APK:"
+        for apk in $(find . -name "*.apk" -type f); do
+          echo "📱 الملف: $apk"
+          echo "📏 الحجم: $(du -h "$apk" | cut -f1)"
+          echo "🕒 التاريخ: $(stat -c %y "$apk")"
+          echo "---"
+        done
+
+    - name: 📤 رفع APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: NetworkCards-Fixed-${{ github.event.inputs.build_type || 'debug' }}-APK
+        path: android-app/**/*.apk
+        retention-days: 30
+
+    - name: 🎊 تقرير النجاح
+      run: |
+        echo "🎉 تم بناء APK بنجاح مع إصلاح Gradle!"
+        echo ""
+        echo "📱 معلومات البناء:"
+        echo "   النوع: ${{ github.event.inputs.build_type || 'debug' }}"
+        echo "   التاريخ: $(date)"
+        echo "   الإصلاح: Gradle Wrapper محدث"
+        echo ""
+        echo "📥 التحميل من Artifacts أسفل الصفحة"
+        echo "🚀 APK جاهز للتثبيت!"
