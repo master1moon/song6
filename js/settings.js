@@ -749,20 +749,22 @@
      * المخرجات: راجع التنفيذ
      */
     function applyPerformanceSettings(performance) {
-        // تحديث إعدادات الكاش
-        if (typeof window.balanceCache !== 'undefined') {
-            const cacheSize = {
-                'small': 100,
-                'medium': 200,
-                'large': 500
-            }[performance.cacheSize] || 200;
-
-            const cacheDuration = performance.cacheDuration * 60 * 1000; // تحويل لمللي ثانية
-
-            // إعادة إنشاء الكاش بالحجم الجديد
-            window.balanceCache = new SmartCache(cacheSize, cacheDuration);
-            window.reportCache = new SmartCache(Math.floor(cacheSize / 4), cacheDuration * 2);
-        }
+        // تحديث إعدادات الكاش دون كسر الأنواع المتخصصة (StoreBalanceCache/ReportCache)
+        try {
+            const sizeNum = ({ small: 100, medium: 200, large: 500 }[performance.cacheSize] || 200);
+            const ttlNum = performance.cacheDuration * 60 * 1000; // مللي ثانية
+            if (typeof window.balanceCache !== 'undefined') {
+                // لا نستبدل instance للحفاظ على الدوال المتخصصة مثل calculateBalance
+                if (typeof window.balanceCache.clear === 'function') window.balanceCache.clear();
+                window.balanceCache.maxSize = sizeNum;
+                window.balanceCache.ttl = ttlNum;
+            }
+            if (typeof window.reportCache !== 'undefined') {
+                if (typeof window.reportCache.clear === 'function') window.reportCache.clear();
+                window.reportCache.maxSize = Math.max(20, Math.floor(sizeNum / 4));
+                window.reportCache.ttl = ttlNum * 2;
+            }
+        } catch(_) { /* تجاهل لتفادي كسر الواجهة */ }
 
         // تطبيق عدد العناصر بالصفحة
         if (typeof window.itemsPerPage !== 'undefined') {

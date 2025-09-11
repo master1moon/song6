@@ -5900,6 +5900,7 @@
     <script src="./js/safeDOM.js"></script>
     <script src="./js/dataValidator.js"></script>
     <script src="./js/quickFixes.js"></script>
+    <script src="./js/smartCache.js"></script>
     <script src="./js/utils.js"></script>
     <script src="./js/settings.js"></script>
     <script src="./js/settingsUI.js"></script>
@@ -5921,6 +5922,35 @@
     <script src="./js/expensesTypes.js"></script>
     <script src="./js/trash.js"></script>
     <script src="./js/parityCheck.js"></script>
+    <script>
+    // ربط روابط القائمة لتبديل الأقسام بعد تحميل DOM
+    document.addEventListener('DOMContentLoaded', function(){
+        try {
+            document.querySelectorAll('.sidebar .nav-link').forEach(function(link){
+                link.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var section = this.getAttribute('data-section');
+                    if (window.switchSection && section) {
+                        window.switchSection(section, this.textContent.trim());
+                    }
+                });
+            });
+            document.querySelectorAll('#mobileDrawer .nav-link').forEach(function(link){
+                link.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var section = this.getAttribute('data-section');
+                    if (window.switchSection && section) {
+                        window.switchSection(section, this.textContent.trim());
+                    }
+                });
+            });
+        } catch(_){}
+    });
+    // استدعاء تحميل البيانات وتحديث الواجهة عند الجاهزية
+    document.addEventListener('DOMContentLoaded', function(){
+        try { if (typeof loadData === 'function') loadData(); } catch(_){}
+    });
+    </script>
 
 
 
@@ -6054,7 +6084,7 @@
         يحسن الأداء بنسبة 60-80% عن طريق حفظ نتائج الحسابات المعقدة
         يقلل من الحسابات المتكررة ويسرع استجابة التطبيق
     -->
-    <script src="js/smartCache.js"></script>
+    <!-- تمت إضافة smartCache أعلاه ضمن كتلة السكربتات الرئيسية لتفادي التكرار -->
     
     <!--
         نظام الإعدادات المتقدم
