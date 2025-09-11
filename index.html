@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <!-- CSP في وضع المراقبة فقط (لا يعطل الميزات الحالية) -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; connect-src 'self' https: data: blob:; font-src 'self' https: data:; frame-ancestors 'self'; report-to csp-endpoint; report-uri https://example.invalid/csp-report">
-    <meta http-equiv="Content-Security-Policy-Report-Only" content="default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; connect-src 'self' https: data: blob:; font-src 'self' https: data:; frame-ancestors 'self'; report-to csp-endpoint; report-uri https://example.invalid/csp-report">
+    <!-- تمت إزالة سياسات CSP عبر meta لأن المتصفحات تتجاهل frame-ancestors/report-uri هنا.
+         عند النشر على خادم، أضف ترويسات CSP من الخادم مباشرة. -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#575657">
     <meta name="apple-mobile-web-app-capable" content="yes">
