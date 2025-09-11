@@ -74,6 +74,18 @@ function savePayment() {
     showNotification('تم إضافة التسديد بنجاح', 'success');
   }
   saveData();
+  
+  // إبطال كاش المحل المتأثر
+  if (typeof window.balanceCache !== 'undefined') {
+    window.balanceCache.invalidateStore(storeId);
+    console.log(`تم تحديث كاش المحل: ${storeId}`);
+  }
+  
+  // إبطال كاش التقارير ذات الصلة
+  if (typeof window.reportsCache !== 'undefined') {
+    window.reportsCache.invalidateReports();
+  }
+  
   refreshCurrentView(); // تحديث جميع العروض المرئية
   showStoreDetails(storeId); // تحديث تفاصيل المحل
   updateProfitReport(); // خاص بتقرير الأرباح

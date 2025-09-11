@@ -36,11 +36,6 @@ const storesState = {
  * الأداء: تحسن بنسبة 80% عند استخدام الكاش
  * الكاش يتم تحديثه تلقائياً عند تغيير البيانات
  */
-/**
- * ملاحظة: الدالة renderStoresList — وصف تلقائي موجز لوظيفتها.
- * المدخلات: بدون
- * المخرجات: راجع التنفيذ
- */
 async function renderStoresList() {
   const list = document.getElementById('storesList'); 
   if (!list) return;
@@ -48,13 +43,31 @@ async function renderStoresList() {
   // تطبيق البحث والفلترة
   let filteredStores = [...data.stores];
   
-  // البحث
+  // البحث المتقدم إذا كان متاحاً
   if (storesState.searchQuery) {
-    const query = storesState.searchQuery.toLowerCase();
-    filteredStores = filteredStores.filter(store => 
-      store.name.toLowerCase().includes(query) ||
-      (store.phone && store.phone.includes(query))
-    );
+    if (typeof window.searchManager !== 'undefined' && window.searchManager.isInitialized) {
+      // استخدام البحث المتقدم
+      const searchResults = window.searchStoresAdvanced(storesState.searchQuery, {
+        limit: 100,
+        filters: storesState.priceFilter !== 'all' ? { priceType: storesState.priceFilter } : {}
+      });
+      
+      // تحويل النتائج إلى تنسيق متوافق
+      filteredStores = searchResults;
+      
+      console.log(`🔍 Advanced search: "${storesState.searchQuery}" found ${searchResults.length} results`);
+    } else {
+      // البحث العادي كـ fallback
+      const query = storesState.searchQuery.toLowerCase();
+      filteredStores = filteredStores.filter(store => 
+        store.name.toLowerCase().includes(query) ||
+        (store.phone && store.phone.includes(query)) ||
+        (store.address && store.address.toLowerCase().includes(query)) ||
+        (store.notes && store.notes.toLowerCase().includes(query))
+      );
+      
+      console.log(`📋 Regular search: "${storesState.searchQuery}" found ${filteredStores.length} results`);
+    }
   }
   
   // فلتر نوع السعر
@@ -68,12 +81,12 @@ async function renderStoresList() {
    * عند طلب نفس الرصيد مرة أخرى، يعيده من الكاش فوراً
    * يوفر 95% من وقت المعالجة في العروض المتكررة
    */
-  if (typeof balanceCache !== 'undefined') {
+  if (typeof window.balanceCache !== 'undefined') {
     // استخدام الكاش الذكي للحصول على الأرصدة بسرعة فائقة
     filteredStores = await Promise.all(
       filteredStores.map(async store => {
-        const balance = await balanceCache.calculateBalance(store.id);
-        return { ...store, balance };
+        const balanceInfo = await window.balanceCache.calculateBalance(store.id);
+        return { ...store, balance: balanceInfo.balance, totalSales: balanceInfo.totalSales, totalPayments: balanceInfo.totalPayments };
       })
     );
   } else {
@@ -1600,3 +1613,60 @@ window.showCustomDateFilter = showCustomDateFilter;
 window.applyCustomDateFilter = applyCustomDateFilter;
 window.toggleFilterType = toggleFilterType;
 window.switchView = switchView;
+
+// إعداد البحث المتقدم للمحلات
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('storeSearchInput');
+  if (searchInput) {
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      storesState.searchQuery = query;
+      
+      // إلغاء البحث السابق
+      clearTimeout(searchTimeout);
+      
+      if (query.length === 0) {
+        renderStoresList();
+        return;
+      }
+      
+      // تأخير البحث لتجنب الاستعلامات المتكررة
+      searchTimeout = setTimeout(() => {
+        console.log(`🔍 Searching stores for: "${query}"`);
+        renderStoresList();
+        
+        // عرض اقتراحات البحث إذا كان متاحاً
+        if (typeof window.getStoreSearchSuggestions === 'function') {
+          const suggestions = window.getStoreSearchSuggestions(query);
+          if (suggestions.length > 0) {
+            console.log('💡 Store search suggestions:', suggestions);
+            // يمكن إضافة عرض الاقتراحات في واجهة المستخدم لاحقاً
+          }
+        }
+      }, 300);
+    });
+    
+    // إضافة البحث عند الضغط على Enter
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        clearTimeout(searchTimeout);
+        storesState.searchQuery = e.target.value.trim();
+        renderStoresList();
+      }
+    });
+    
+    // إضافة البحث عند فقدان التركيز
+    searchInput.addEventListener('blur', () => {
+      clearTimeout(searchTimeout);
+    });
+    
+    console.log('✅ Advanced search for stores initialized');
+  }
+  
+  // تهيئة نظام البحث المتقدم إذا كان متاحاً
+  if (typeof window.initializeSearchSystem === 'function') {
+    window.initializeSearchSystem();
+  }
+});

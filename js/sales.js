@@ -125,15 +125,14 @@ function saveSale() {
   saveData();
   
   // إبطال كاش المحل المتأثر
-  if (typeof balanceCache !== 'undefined') {
-    balanceCache.invalidateStore(storeId);
+  if (typeof window.balanceCache !== 'undefined') {
+    window.balanceCache.invalidateStore(storeId);
     console.log(`تم تحديث كاش المحل: ${storeId}`);
   }
   
   // إبطال كاش التقارير ذات الصلة
-  if (typeof reportCache !== 'undefined') {
-    reportCache.invalidate(/^report_profit/);
-    reportCache.invalidate(/^report_debt/);
+  if (typeof window.reportsCache !== 'undefined') {
+    window.reportsCache.invalidateReports();
   }
   
   // تحديث جميع العروض والتقارير المتعلقة

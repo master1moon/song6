@@ -288,17 +288,39 @@ document.addEventListener('DOMContentLoaded', () => {
  * يمكّن التطبيق من العمل offline وتحسين الأداء
  * يتعامل مع التخزين المؤقت للملفات الثابتة
  */
-// Service Worker registration
+// Service Worker registration - تم التحديث للنسخة المتقدمة
 (function(){
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./serviceworker.js', { scope: './' })
+      // محاولة تسجيل Service Worker المتقدم أولاً
+      const advancedSWPath = './advanced-serviceworker.js';
+      const fallbackSWPath = './serviceworker.js';
+      
+      navigator.serviceWorker.register(advancedSWPath, { scope: './' })
         .then(registration => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          console.log('✅ Advanced ServiceWorker registration successful with scope: ', registration.scope);
+          
+          // تهيئة مدير Service Worker إذا كان متاحاً
+          if (typeof window.initializeServiceWorker === 'function') {
+            window.initializeServiceWorker();
+          }
         })
         .catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
+          console.warn('⚠️ Advanced ServiceWorker registration failed, trying fallback: ', err);
+          
+          // محاولة تسجيل Service Worker العادي كـ fallback
+          return navigator.serviceWorker.register(fallbackSWPath, { scope: './' });
+        })
+        .then(registration => {
+          if (registration) {
+            console.log('✅ Fallback ServiceWorker registration successful with scope: ', registration.scope);
+          }
+        })
+        .catch(err => {
+          console.error('❌ All ServiceWorker registration attempts failed: ', err);
         });
     });
+  } else {
+    console.warn('❌ ServiceWorker not supported in this browser');
   }
 })();

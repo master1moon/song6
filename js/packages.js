@@ -36,7 +36,43 @@ function renderPackagesTable() {
   const table = document.getElementById('packagesTable');
   if (!table) return; 
   
-  // استخدام التحسينات إذا كانت متاحة
+  // استخدام Virtual Scrolling للجداول الكبيرة (أكثر من 50 عنصر)
+  if (typeof VirtualScrollTable !== 'undefined' && data.packages.length > 50) {
+    console.log(`🚀 Using Virtual Scrolling for ${data.packages.length} packages`);
+    
+    const virtualTable = new VirtualScrollTable('packagesTable', data.packages, {
+      itemHeight: 60,
+      headers: ['اسم الباقة', 'سعر القطاعي', 'سعر الجملة', 'سعر الموزع', 'التاريخ', 'إجراءات'],
+      renderItem: (pkg, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${pkg.name}</td>
+          <td class="currency">${pkg.retailPrice ? formatNumber(pkg.retailPrice) : '-'}</td>
+          <td class="currency">${pkg.wholesalePrice ? formatNumber(pkg.wholesalePrice) : '-'}</td>
+          <td class="currency">${pkg.distributorPrice ? formatNumber(pkg.distributorPrice) : '-'}</td>
+          <td>${pkg.createdAt}</td>
+          <td class="action-buttons">
+            <button class="btn btn-sm btn-warning" onclick="editPackage('${pkg.id}')" title="تعديل">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deletePackage('${pkg.id}')" title="حذف">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        `;
+        return row;
+      }
+    });
+    
+    // حفظ مرجع للجدول الافتراضي للتحديث لاحقاً
+    window.packagesVirtualTable = virtualTable;
+    return;
+  }
+  
+  // العرض العادي للجداول الصغيرة أو عند عدم توفر Virtual Scrolling
+  console.log(`📋 Using regular table for ${data.packages.length} packages`);
+  
+  // استخدام التحسينات إذا كانت متاحة (fallback للنظام القديم)
   if (window.$dom && window.$dom.table && data.packages.length > 50) {
     window.$dom.table(data.packages, {
       containerId: 'packagesTable',

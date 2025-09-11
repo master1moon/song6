@@ -2287,6 +2287,7 @@
                                     <button class="btn btn-sm btn-outline-danger" id="exportSummariesPdf"><i class="fas fa-file-pdf me-1"></i>PDF</button>
                                     -->
                                     <button class="btn btn-sm btn-outline-primary" id="openSummariesReport"><i class="fas fa-file-alt me-1"></i>فتح التقرير</button>
+                                    <button class="btn btn-sm btn-outline-info" id="generateAdvancedReport"><i class="fas fa-cogs me-1"></i>تقرير متقدم</button>
                                 </div>
                             </div>
                             <div class="row g-3">
@@ -6331,6 +6332,30 @@
     <!-- مساعد التخزين السحابي -->
     <script src="js/cloudStorageHelper.js"></script>
     
+    <!-- 🚀 التحسينات الجديدة - بدء تطبيق التحسينات -->
+    
+    <!-- إصلاحات الأخطاء الحرجة -->
+    <script src="js/bugFixes.js"></script>
+    
+    <!-- نظام Virtual Scrolling للجداول الكبيرة -->
+    <script src="js/virtualScrolling.js"></script>
+    
+    <!-- نظام البحث المتقدم -->
+    <script src="js/advancedSearch.js"></script>
+    
+    <!-- Web Workers للتقارير الثقيلة -->
+    <script src="js/reportWorker.js"></script>
+    <script src="js/workerManager.js"></script>
+    
+    <!-- مدير Service Worker المتقدم -->
+    <script src="js/serviceWorkerManager.js"></script>
+    
+    <!-- مدير الأداء والتهيئة الشاملة -->
+    <script src="js/performanceInit.js"></script>
+    
+    <!-- نظام اختبار الأداء -->
+    <script src="js/performanceTest.js"></script>
+    
     <script>
     // حل احتياطي: دالة بسيطة لعرض تعليمات Google Drive - متاحة فوراً
     window.showGoogleDriveInstructions = function(backupData) {
@@ -6478,6 +6503,43 @@ print(f"📁 المسار الكامل: {filepath}`;
             console.log('✅ CloudStorageHelper loaded successfully');
         } else {
             console.error('❌ CloudStorageHelper not loaded');
+        }
+        
+        // إعداد زر التقرير المتقدم
+        const advancedReportBtn = document.getElementById('generateAdvancedReport');
+        if (advancedReportBtn) {
+            advancedReportBtn.addEventListener('click', () => {
+                if (typeof window.generateAdvancedReport === 'function') {
+                    window.generateAdvancedReport();
+                } else {
+                    console.error('❌ Advanced report function not loaded');
+                    if (typeof showNotification === 'function') {
+                        showNotification('نظام التقارير المتقدم غير متاح', 'error');
+                    }
+                }
+            });
+            console.log('✅ Advanced report button initialized');
+        }
+        
+        // إعداد زر تحليل أنماط المبيعات
+        const analyzePatternsBtn = document.createElement('button');
+        analyzePatternsBtn.className = 'btn btn-sm btn-outline-warning ms-2';
+        analyzePatternsBtn.innerHTML = '<i class="fas fa-brain me-1"></i>تحليل الأنماط';
+        analyzePatternsBtn.addEventListener('click', () => {
+            if (typeof window.analyzeSalesPatternsAdvanced === 'function') {
+                window.analyzeSalesPatternsAdvanced();
+            } else {
+                console.error('❌ Sales patterns analysis function not loaded');
+                if (typeof showNotification === 'function') {
+                    showNotification('نظام تحليل الأنماط غير متاح', 'error');
+                }
+            }
+        });
+        
+        // إضافة الزر بجانب زر التقرير المتقدم
+        if (advancedReportBtn && advancedReportBtn.parentNode) {
+            advancedReportBtn.parentNode.appendChild(analyzePatternsBtn);
+            console.log('✅ Sales patterns analysis button added');
         }
     });
     
