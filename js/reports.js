@@ -910,37 +910,74 @@ function generateDebtReport() {
   if (!table) return;
   if (typeof FeatureFlags !== 'undefined' && FeatureFlags.isEnabled('safeDomRendering') && typeof setHTML === 'function') { setHTML(table, ''); } else { table.innerHTML = ''; }
   const { fromDate, toDate } = getPeriodRange('debts');
-  let storesArr = data.stores.slice();
-  const totalDebts = storesArr.reduce((sum, store) => {
-    const storeSales = data.sales.filter(s => s.storeId === store.id && inPeriod(s.date, fromDate, toDate));
-    const storePayments = data.payments.filter(p => p.storeId === store.id && inPeriod(p.date, fromDate, toDate));
-    const totalSales = storeSales.reduce((s, sale) => s + (sale.total||0), 0);
-    const totalPayments = storePayments.reduce((p, payment) => p + (payment.amount||0), 0);
-    return sum + (totalSales - totalPayments);
-  }, 0);
-  const totalDebtsEl = document.getElementById('totalDebts');
-  if (totalDebtsEl) totalDebtsEl.textContent = formatNumber(totalDebts);
-  const debtsSummaryEl = document.getElementById('debtsTotalSummary'); if (debtsSummaryEl) debtsSummaryEl.textContent = formatNumber(totalDebts);
-  storesArr.forEach(store => {
-    const storeSales = data.sales.filter(s => s.storeId === store.id && inPeriod(s.date, fromDate, toDate));
-    const storePayments = data.payments.filter(p => p.storeId === store.id && inPeriod(p.date, fromDate, toDate));
-    const totalSales = storeSales.reduce((sum, sale) => sum + (sale.total||0), 0);
-    const totalPayments = storePayments.reduce((sum, payment) => sum + (payment.amount||0), 0);
-    const remaining = totalSales - totalPayments;
-    const lastSale = storeSales.length > 0 ? storeSales.reduce((latest, sale) => sale.date > latest ? sale.date : latest, '') : '';
-    const lastPayment = storePayments.length > 0 ? storePayments.reduce((latest, payment) => payment.date > latest ? payment.date : latest, '') : '';
-    const lastTransaction = formatDateEn(lastSale > lastPayment ? lastSale : lastPayment);
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${store.name}</td>
-      <td class="currency">${formatNumber(totalSales)}</td>
-      <td class="currency">${formatNumber(totalPayments)}</td>
-      <td class="currency ${remaining > 0 ? 'text-danger' : 'text-success'}">${formatNumber(Math.abs(remaining))}</td>
-      <td>${getPriceTypeName(store.priceType)}</td>
-      <td>${lastTransaction || 'لا يوجد'}</td>
-    `;
-    table.appendChild(row);
-  });
+  // استخدام Web Worker إن أمكن
+  try {
+    if (window.Worker) {
+      const worker = new Worker('./js/reportsWorker.js');
+      worker.onmessage = function(ev){
+        const msg = ev.data || {};
+        if (!msg.ok) { fallbackDebt(); return; }
+        const totalDebtsEl = document.getElementById('totalDebts');
+        if (totalDebtsEl) totalDebtsEl.textContent = formatNumber(msg.totals.totalDebts||0);
+        const debtsSummaryEl = document.getElementById('debtsTotalSummary'); if (debtsSummaryEl) debtsSummaryEl.textContent = formatNumber(msg.totals.totalDebts||0);
+        (msg.rows||[]).forEach(r => {
+          const row = document.createElement('tr');
+          const lastTx = formatDateEn(r.lastTransaction);
+          const cls = r.remaining > 0 ? 'text-danger' : 'text-success';
+          row.innerHTML = `
+            <td>${r.name}</td>
+            <td class="currency">${formatNumber(r.totalSales)}</td>
+            <td class="currency">${formatNumber(r.totalPayments)}</td>
+            <td class="currency ${cls}">${formatNumber(Math.abs(r.remaining))}</td>
+            <td>${getPriceTypeName(r.priceType)}</td>
+            <td>${lastTx || 'لا يوجد'}</td>
+          `;
+          table.appendChild(row);
+        });
+        worker.terminate();
+      };
+      worker.onerror = function(){ fallbackDebt(); try{ worker.terminate(); }catch{} };
+      worker.postMessage({ type:'debt', payload: { stores: data.stores||[], sales: data.sales||[], payments: data.payments||[], fromDate, toDate } });
+      return;
+    }
+  } catch(_) { /* متابعة بالسقوط */ }
+
+  // رجوع تلقائي بدون عامل
+  fallbackDebt();
+
+  function fallbackDebt(){
+    const storesArr = (data.stores||[]).slice();
+    const totalDebts = storesArr.reduce((sum, store) => {
+      const storeSales = (data.sales||[]).filter(s => s.storeId === store.id && inPeriod(s.date, fromDate, toDate));
+      const storePayments = (data.payments||[]).filter(p => p.storeId === store.id && inPeriod(p.date, fromDate, toDate));
+      const totalSales = storeSales.reduce((s, sale) => s + (sale.total||0), 0);
+      const totalPayments = storePayments.reduce((p, payment) => p + (payment.amount||0), 0);
+      return sum + (totalSales - totalPayments);
+    }, 0);
+    const totalDebtsEl = document.getElementById('totalDebts');
+    if (totalDebtsEl) totalDebtsEl.textContent = formatNumber(totalDebts);
+    const debtsSummaryEl = document.getElementById('debtsTotalSummary'); if (debtsSummaryEl) debtsSummaryEl.textContent = formatNumber(totalDebts);
+    storesArr.forEach(store => {
+      const storeSales = (data.sales||[]).filter(s => s.storeId === store.id && inPeriod(s.date, fromDate, toDate));
+      const storePayments = (data.payments||[]).filter(p => p.storeId === store.id && inPeriod(p.date, fromDate, toDate));
+      const totalSales = storeSales.reduce((sum, sale) => sum + (sale.total||0), 0);
+      const totalPayments = storePayments.reduce((sum, payment) => sum + (payment.amount||0), 0);
+      const remaining = totalSales - totalPayments;
+      const lastSale = storeSales.length > 0 ? storeSales.reduce((latest, sale) => sale.date > latest ? sale.date : latest, '') : '';
+      const lastPayment = storePayments.length > 0 ? storePayments.reduce((latest, payment) => payment.date > latest ? payment.date : latest, '') : '';
+      const lastTransaction = formatDateEn(lastSale > lastPayment ? lastSale : lastPayment);
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${store.name}</td>
+        <td class="currency">${formatNumber(totalSales)}</td>
+        <td class="currency">${formatNumber(totalPayments)}</td>
+        <td class="currency ${remaining > 0 ? 'text-danger' : 'text-success'}">${formatNumber(Math.abs(remaining))}</td>
+        <td>${getPriceTypeName(store.priceType)}</td>
+        <td>${lastTransaction || 'لا يوجد'}</td>
+      `;
+      table.appendChild(row);
+    });
+  }
 }
 
 /**
