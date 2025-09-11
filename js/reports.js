@@ -1905,13 +1905,30 @@ async function exportStoreData(storeId, format) {
     const a = document.createElement('a'); a.href = url; a.download = `${filename}.txt`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     showNotification('تم تصدير بيانات المحل إلى ملف TXT', 'success');
-  } else if (format === 'printpage' || format === 'pdf') {
+  } else if (format === 'pdf') {
+    // توليد PDF مباشر إن توفرت مكتبة html2pdf، وإلا الرجوع إلى فتح صفحة التقرير
+    try {
+      const html = buildStoreReportHTML(store, periodText, mappedSalesForExport, mappedPaymentsForExport, totalSales, totalPayments, remaining);
+      if (typeof html2pdf !== 'undefined') {
+        const container = document.createElement('div');
+        container.style.position = 'fixed'; container.style.left = '-9999px';
+        container.innerHTML = html; document.body.appendChild(container);
+        await html2pdf().from(container).set({ filename: `${filename}.pdf`, pagebreak: { mode: ['css','legacy'] } }).save();
+        document.body.removeChild(container);
+        showNotification('تم إنشاء ملف PDF للتقرير', 'success');
+      } else {
+        const win = window.open('', '_blank'); if (!win || !win.document) { showNotification('يمنع المتصفح النوافذ المنبثقة. الرجاء السماح بها.', 'error'); return; }
+        win.document.open(); win.document.write(html); win.document.close();
+        showNotification('تم فتح صفحة الطباعة. اضغط حفظ كـ PDF.', 'success');
+      }
+    } catch (e) { showNotification('حدث خطأ أثناء إنشاء PDF', 'error'); }
+  } else if (format === 'printpage') {
     try {
       const html = buildStoreReportHTML(store, periodText, mappedSalesForExport, mappedPaymentsForExport, totalSales, totalPayments, remaining);
       const win = window.open('', '_blank'); if (!win || !win.document) { showNotification('يمنع المتصفح النوافذ المنبثقة. الرجاء السماح بها.', 'error'); return; }
       win.document.open(); win.document.write(html); win.document.close();
-      showNotification(format === 'pdf' ? 'تم فتح صفحة الطباعة. اضغط حفظ كـ PDF.' : 'تم فتح صفحة التقرير.', 'success');
-    } catch (e) { showNotification(format === 'pdf' ? 'حدث خطأ أثناء إنشاء PDF' : 'تعذر فتح صفحة التقرير', 'error'); }
+      showNotification('تم فتح صفحة التقرير.', 'success');
+    } catch (e) { showNotification('تعذر فتح صفحة التقرير', 'error'); }
   } else if (format === 'statement') {
     // كشف الحساب المتحرك الجديد
     try {
@@ -2131,7 +2148,7 @@ function exportExpensesData(format) {
     const a = document.createElement('a'); a.href = url; a.download = `${filename}.txt`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     showNotification('تم تصدير المصروفات إلى ملف TXT', 'success');
-  } else if (format === 'printpage' || format === 'pdf') {
+  } else if (format === 'pdf') {
     try {
       const html = buildExpensesReportHTML(mapped, periodText);
       const win = window.open('', '_blank'); if (!win || !win.document) { showNotification('يمنع المتصفح النوافذ المنبثقة. الرجاء السماح بها.', 'error'); return; }
