@@ -2000,11 +2000,11 @@
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <label for="dashboardPeriod" class="mb-0">مدة الحساب:</label>
                     <select id="dashboardPeriod" class="form-select form-select-sm" style="width:auto;">
-                        <option value="from_start" selected>من البداية</option>
+                        <option value="from_start">من البداية</option>
                         <option value="day">خلال يوم</option>
                         <option value="week">خلال اسبوع</option>
                         <option value="month">خلال شهر</option>
-                        <option value="this_month">خلال هذا الشهر</option>
+                        <option value="this_month" selected>خلال هذا الشهر</option>
                         <option value="prev_month">خلال الشهر السابق</option>
                     </select>
                 </div>
@@ -3362,7 +3362,7 @@
         // تحديد فترة لوحة التحكم حسب اختيار المستخدم
         function getDashboardPeriodRange() {
             const select = document.getElementById('dashboardPeriod');
-            const val = select ? select.value : 'from_start';
+            const val = select ? select.value : 'this_month';
             const today = moment().format('YYYY-MM-DD');
             if (val === 'day') {
                 const from = moment().startOf('day').format('YYYY-MM-DD');
@@ -3401,7 +3401,7 @@
             document.getElementById('storesCount').textContent = data.stores.length;
             
             // إجمالي الكروت لا يعتمد على التاريخ
-            const totalCards = data.inventory.reduce((sum, item) => sum + item.quantity, 0);
+            const totalCards = data.inventory.reduce((sum, item) => sum + (Number(item.quantity)||0), 0);
             document.getElementById('totalCards').textContent = formatNumber(totalCards, false);
             
             // تطبيق الفلاتر الزمنية على مبيعات/تسديدات/مصروفات
