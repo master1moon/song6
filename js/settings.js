@@ -959,7 +959,13 @@
     function lockApp() {
         // عرض شاشة القفل
         console.log('تم قفل التطبيق بسبب عدم النشاط');
-        // TODO: تنفيذ شاشة القفل
+        
+        // تفعيل شاشة القفل
+        if (typeof window.screenLock !== 'undefined') {
+            window.screenLock.lock();
+        } else {
+            console.warn('نظام قفل الشاشة غير متاح');
+        }
     }
 
     /**
