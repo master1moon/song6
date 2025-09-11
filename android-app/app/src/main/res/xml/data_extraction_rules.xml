@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Include app data in cloud backups -->
+        <include domain="database" path="network_cards_database" />
+        <include domain="sharedpref" path="app_preferences.xml" />
+        
+        <!-- Exclude sensitive data from cloud backups -->
+        <exclude domain="sharedpref" path="auth_tokens.xml" />
+        <exclude domain="sharedpref" path="github_settings.xml" />
+        <exclude domain="file" path="temp/" />
+        <exclude domain="file" path="cache/" />
+    </cloud-backup>
+    
+    <device-transfer>
+        <!-- Include data when transferring to new device -->
+        <include domain="database" path="." />
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="backups/" />
+        
+        <!-- Exclude temporary data -->
+        <exclude domain="file" path="temp/" />
+        <exclude domain="file" path="cache/" />
+    </device-transfer>
+</data-extraction-rules>
