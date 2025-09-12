@@ -101,7 +101,7 @@ class SessionGuard {
                 return;
             }
             
-            return originalFunction.apply(this, args);
+            return originalFunction.apply(window, args);
         };
 
         this.protectedFunctions.push(functionName);

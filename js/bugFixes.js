@@ -8,8 +8,8 @@
  */
 
 // إصلاح متغير today المفقود
-if (typeof today === 'undefined') {
-  var today = new Date().toISOString().split('T')[0];
+if (typeof window.today === 'undefined') {
+  window.today = new Date().toISOString().split('T')[0];
 }
 
 // إصلاح window.$dom و window.$safe المفقودين

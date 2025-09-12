@@ -81,14 +81,23 @@ async function renderStoresList() {
    * عند طلب نفس الرصيد مرة أخرى، يعيده من الكاش فوراً
    * يوفر 95% من وقت المعالجة في العروض المتكررة
    */
-  if (typeof window.balanceCache !== 'undefined') {
+  if (typeof window.balanceCache !== 'undefined' && typeof window.balanceCache.calculateBalance === 'function') {
     // استخدام الكاش الذكي للحصول على الأرصدة بسرعة فائقة
-    filteredStores = await Promise.all(
-      filteredStores.map(async store => {
-        const balanceInfo = await window.balanceCache.calculateBalance(store.id);
-        return { ...store, balance: balanceInfo.balance, totalSales: balanceInfo.totalSales, totalPayments: balanceInfo.totalPayments };
-      })
-    );
+    try {
+      filteredStores = await Promise.all(
+        filteredStores.map(async store => {
+          const balanceInfo = await window.balanceCache.calculateBalance(store.id);
+          return { ...store, balance: balanceInfo.balance, totalSales: balanceInfo.totalSales, totalPayments: balanceInfo.totalPayments };
+        })
+      );
+    } catch (error) {
+      console.warn('خطأ في كاش الأرصدة، استخدام الطريقة العادية:', error);
+      // fallback للطريقة العادية
+      filteredStores = filteredStores.map(store => {
+        const balance = calculateStoreBalance(store.id);
+        return { ...store, balance: balance };
+      });
+    }
   } else {
     // الطريقة القديمة كـ fallback إذا لم يكن الكاش متاحاً
     console.warn('نظام الكاش غير متاح، استخدام الطريقة البطيئة');
