@@ -296,7 +296,13 @@ class ResponsiveManager {
     const tables = document.querySelectorAll('.data-table');
     
     tables.forEach(table => {
-      const wrapper = table.closest('.responsive-table-wrapper') || this.wrapTable(table);
+      let wrapper = table.closest('.responsive-table-wrapper');
+      if (!wrapper) {
+        wrapper = document.createElement('div');
+        wrapper.className = 'responsive-table-wrapper';
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      }
       
       if (this.currentBreakpoint === 'xs' || this.currentBreakpoint === 'sm') {
         // تحويل الجدول لعرض كروت في الهواتف

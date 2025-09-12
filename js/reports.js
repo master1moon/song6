@@ -157,7 +157,7 @@ async function updateProfitReport() {
   if (typeof reportCache !== 'undefined') {
     const cacheKey = `profit_${fromDate}_${toDate}`;
     
-    reportData = await reportCache.getOrCompute(
+    reportData = await reportCache.get(
       cacheKey,
       async () => {
         console.log(`حساب تقرير الأرباح للفترة: ${fromDate} إلى ${toDate}`);
