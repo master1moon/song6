@@ -919,22 +919,24 @@
                 </div>
 
                 <!-- إعدادات PIN وكلمة المرور -->
-                <div class="row mb-3" id="lockCredentials" style="${security.lockType === 'none' ? 'display:none' : ''}">
-                    <div class="col-md-6" id="pinSection" style="${security.lockType === 'pin' ? '' : 'display:none'}">
+                <div class="mb-3" id="lockCredentials" style="${security.lockType === 'none' ? 'display:none' : ''}">
+                    <div id="pinSection" style="${security.lockType === 'pin' ? '' : 'display:none'}">
                         <label class="form-label">رمز PIN (4-6 أرقام)</label>
-                        <input type="password" class="form-control" id="setting-pin"
+                        <input type="password" class="form-control form-control-lg" id="setting-pin"
                                value="${security.pin || ''}" maxlength="6" placeholder="أدخل رمز PIN"
                                onchange="AppSettings.update('security.pin', this.value); updateLockButton()"
-                               pattern="[0-9]{4,6}" title="4-6 أرقام فقط">
+                               pattern="[0-9]{4,6}" title="4-6 أرقام فقط" 
+                               style="font-size: 18px; text-align: center; letter-spacing: 3px;">
                         <div class="form-text">سيستخدم لفتح الشاشة المقفلة</div>
                     </div>
-                    <div class="col-md-6" id="passwordSection" style="${security.lockType === 'password' ? '' : 'display:none'}">
+                    <div id="passwordSection" style="${security.lockType === 'password' ? '' : 'display:none'}">
                         <label class="form-label">كلمة المرور</label>
-                        <input type="password" class="form-control" id="setting-password"
+                        <input type="password" class="form-control form-control-lg" id="setting-password"
                                value="${security.password || ''}" placeholder="أدخل كلمة المرور"
                                onchange="AppSettings.update('security.password', this.value); updateLockButton()"
-                               minlength="4" title="4 أحرف على الأقل">
-                        <div class="form-text">يجب أن تكون 8 أحرف على الأقل</div>
+                               minlength="4" title="4 أحرف على الأقل"
+                               style="font-size: 16px;">
+                        <div class="form-text">يجب أن تكون 4 أحرف على الأقل</div>
                     </div>
                 </div>
 
