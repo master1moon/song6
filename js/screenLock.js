@@ -14,6 +14,7 @@ class ScreenLockManager {
         this.currentMethod = 'pin';
         this.maxAttempts = 5;
         this.currentAttempts = 0;
+        this.sessionKey = 'screenLockSession_' + Date.now(); // مفتاح الجلسة الحالية
         
         this.init();
     }
@@ -26,12 +27,43 @@ class ScreenLockManager {
         this.setupEventListeners();
         this.loadSettings();
         
+        // فحص حالة القفل عند تحميل الصفحة
+        this.checkLockStateOnLoad();
+        
         // تحديث ظهور زر القفل عند التحميل
         setTimeout(() => {
             this.updateLockButtonVisibility();
         }, 1000);
         
         console.log('🔒 تم تهيئة نظام قفل الشاشة');
+    }
+
+    /**
+     * فحص حالة القفل عند تحميل الصفحة
+     */
+    checkLockStateOnLoad() {
+        const settings = this.getSettings();
+        
+        // إذا كان القفل مفعل، فحص آخر جلسة
+        if (settings.autoLockEnabled && settings.lockMethod !== 'none') {
+            const lastUnlock = localStorage.getItem('lastUnlockTime');
+            const sessionTimeout = (settings.sessionTimeout || 30) * 60 * 1000; // تحويل لمللي ثانية
+            const now = Date.now();
+            
+            // إذا لم تكن هناك جلسة سابقة أو انتهت الجلسة
+            if (!lastUnlock || (now - parseInt(lastUnlock)) > sessionTimeout) {
+                console.log('🔒 الجلسة منتهية أو غير موجودة - قفل التطبيق');
+                
+                // قفل فوري عند تحميل الصفحة
+                setTimeout(() => {
+                    this.lock();
+                }, 500);
+            } else {
+                console.log('🔓 الجلسة صالحة - التطبيق مفتوح');
+                // تحديث آخر نشاط
+                this.updateActivity();
+            }
+        }
     }
 
     /**
@@ -340,7 +372,28 @@ class ScreenLockManager {
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 this.updateActivity();
+            } else {
+                // عند العودة للتبويب، فحص الجلسة
+                if (!this.isSessionValid()) {
+                    this.lock();
+                }
             }
+        });
+
+        // مستمع إغلاق الصفحة/تحديث
+        window.addEventListener('beforeunload', () => {
+            // لا نمسح الجلسة عند التحديث - فقط عند القفل اليدوي
+            // هذا يسمح بالاستمرارية إذا كانت الجلسة صالحة
+        });
+
+        // مستمع تحميل الصفحة
+        window.addEventListener('load', () => {
+            // فحص الجلسة عند تحميل الصفحة
+            setTimeout(() => {
+                if (!this.isSessionValid() && !this.isLocked) {
+                    this.lock();
+                }
+            }, 1000);
         });
     }
 
@@ -350,7 +403,17 @@ class ScreenLockManager {
     updateActivity() {
         if (this.isLocked) return;
         
+        // فحص صحة الجلسة أولاً
+        if (!this.isSessionValid()) {
+            console.log('🔒 الجلسة غير صالحة - قفل التطبيق');
+            this.lock();
+            return;
+        }
+        
         this.lastActivity = Date.now();
+        
+        // تحديث آخر نشاط في الجلسة
+        localStorage.setItem('lastActivity', Date.now().toString());
         
         // إعادة تشغيل مؤقت عدم النشاط
         if (this.inactivityTimer) {
@@ -363,6 +426,25 @@ class ScreenLockManager {
                 this.lock();
             }, settings.inactivityMinutes * 60 * 1000);
         }
+    }
+
+    /**
+     * فحص صحة الجلسة
+     */
+    isSessionValid() {
+        const settings = this.getSettings();
+        
+        // إذا لم يكن القفل مفعل، الجلسة صالحة
+        if (!settings.autoLockEnabled || settings.lockMethod === 'none') {
+            return true;
+        }
+        
+        const lastUnlock = localStorage.getItem('lastUnlockTime');
+        const sessionTimeout = (settings.sessionTimeout || 30) * 60 * 1000;
+        const now = Date.now();
+        
+        // فحص انتهاء الجلسة
+        return lastUnlock && (now - parseInt(lastUnlock)) <= sessionTimeout;
     }
 
     /**
@@ -411,6 +493,9 @@ class ScreenLockManager {
         this.currentAttempts = 0;
         this.currentMethod = settings.lockMethod || 'pin';
         this.maxAttempts = settings.maxAttempts || 5;
+        
+        // مسح الجلسة عند القفل
+        localStorage.removeItem('lastUnlockTime');
         
         const lockScreen = document.getElementById('screenLock');
         if (lockScreen) {
@@ -471,6 +556,9 @@ class ScreenLockManager {
     performUnlock() {
         this.isLocked = false;
         this.currentAttempts = 0;
+        
+        // حفظ وقت فتح القفل للجلسة
+        localStorage.setItem('lastUnlockTime', Date.now().toString());
         
         const lockScreen = document.getElementById('screenLock');
         if (lockScreen) {
@@ -908,11 +996,45 @@ class ScreenLockManager {
             clearTimeout(this.inactivityTimer);
         }
         
+        // تمديد الجلسة
+        localStorage.setItem('lastUnlockTime', Date.now().toString());
+        
         setTimeout(() => {
             this.updateActivity();
         }, minutes * 60 * 1000);
         
         console.log(`تم تعطيل القفل التلقائي لمدة ${minutes} دقيقة`);
+        
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(`تم تعطيل القفل التلقائي لمدة ${minutes} دقيقة`, 'info');
+        }
+    }
+
+    /**
+     * مسح الجلسة نهائياً (عند تسجيل الخروج)
+     */
+    clearSession() {
+        localStorage.removeItem('lastUnlockTime');
+        localStorage.removeItem('lastActivity');
+        this.isLocked = false;
+        
+        if (this.inactivityTimer) {
+            clearTimeout(this.inactivityTimer);
+        }
+        
+        console.log('🔒 تم مسح الجلسة نهائياً');
+    }
+
+    /**
+     * قفل فوري (للطوارئ)
+     */
+    emergencyLock() {
+        this.clearSession();
+        this.lock();
+        
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('تم قفل التطبيق فوراً', 'warning');
+        }
     }
 }
 

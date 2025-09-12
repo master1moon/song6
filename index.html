@@ -6451,7 +6451,68 @@
     <!-- نظام قفل الشاشة المتقدم -->
     <script src="js/screenLock.js"></script>
     
+    <!-- حارس الجلسة للحماية الإضافية -->
+    <script src="js/sessionGuard.js"></script>
+    
     <script>
+    // حماية فورية عند تحميل الصفحة
+    (function() {
+        // فحص حالة القفل فوراً قبل عرض أي محتوى
+        function checkLockOnPageLoad() {
+            // التحقق من إعدادات القفل
+            let securitySettings = {};
+            try {
+                const appSettings = localStorage.getItem('appSettings');
+                if (appSettings) {
+                    const parsed = JSON.parse(appSettings);
+                    securitySettings = parsed.security || {};
+                }
+            } catch (e) {
+                console.warn('خطأ في قراءة إعدادات الأمان:', e);
+            }
+
+            // إذا كان القفل مفعل
+            if (securitySettings.appLock && securitySettings.lockType !== 'none') {
+                const lastUnlock = localStorage.getItem('lastUnlockTime');
+                const sessionTimeout = (securitySettings.sessionTimeout || 30) * 60 * 1000;
+                const now = Date.now();
+
+                // إذا لم تكن هناك جلسة أو انتهت
+                if (!lastUnlock || (now - parseInt(lastUnlock)) > sessionTimeout) {
+                    console.log('🔒 قفل فوري عند تحميل الصفحة');
+                    
+                    // إخفاء المحتوى فوراً
+                    document.body.style.visibility = 'hidden';
+                    
+                    // انتظار تحميل نظام القفل ثم القفل
+                    const checkLockSystem = setInterval(() => {
+                        if (typeof window.screenLock !== 'undefined') {
+                            clearInterval(checkLockSystem);
+                            window.screenLock.lock();
+                            document.body.style.visibility = 'visible';
+                        }
+                    }, 100);
+                    
+                    // timeout للأمان
+                    setTimeout(() => {
+                        clearInterval(checkLockSystem);
+                        document.body.style.visibility = 'visible';
+                        if (typeof window.screenLock !== 'undefined') {
+                            window.screenLock.lock();
+                        }
+                    }, 3000);
+                }
+            }
+        }
+
+        // تشغيل الفحص فوراً
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkLockOnPageLoad);
+        } else {
+            checkLockOnPageLoad();
+        }
+    })();
+    
     // حل احتياطي: دالة بسيطة لعرض تعليمات Google Drive - متاحة فوراً
     window.showGoogleDriveInstructions = function(backupData) {
         console.log('showGoogleDriveInstructions called with data:', backupData);
