@@ -2051,28 +2051,12 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 
-                <!-- زر قفل الشاشة -->
-                <div class="btn-group ms-2" role="group">
-                    <button class="btn btn-outline-warning" onclick="screenLock.manualLock()" title="قفل الشاشة">
-                        <i class="fas fa-lock"></i>
-                        <span class="d-none d-lg-inline ms-2">قفل</span>
-                    </button>
-                    <button class="btn btn-outline-warning dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" title="إعدادات القفل">
-                        <span class="visually-hidden">إعدادات القفل</span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#" onclick="screenLock.openSecuritySettings()">
-                            <i class="fas fa-cog me-2"></i>إعدادات الأمان
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" onclick="screenLock.disableAutoLock(60)">
-                            <i class="fas fa-clock me-2"></i>تعطيل لساعة واحدة
-                        </a></li>
-                        <li><a class="dropdown-item" href="#" onclick="screenLock.testLock()">
-                            <i class="fas fa-vial me-2"></i>اختبار القفل
-                        </a></li>
-                    </ul>
-                </div>
+                <!-- زر قفل الشاشة (يظهر فقط عند تفعيل القفل) -->
+                <button id="lockButton" class="btn btn-outline-warning btn-animated hover-scale btn-ripple btn-material btn-text ms-2 d-none" 
+                        onclick="screenLock.manualLock()" title="قفل الشاشة">
+                    <i class="fas fa-lock"></i>
+                    <span class="d-none d-lg-inline ms-2">قفل</span>
+                </button>
                 </div>
             </div>
 

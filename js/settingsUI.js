@@ -846,7 +846,7 @@
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="setting-appLock"
                                    ${security.appLock ? 'checked' : ''} 
-                                   onchange="AppSettings.update('security.appLock', this.checked)">
+                                   onchange="AppSettings.update('security.appLock', this.checked); updateLockButton()">
                             <label class="form-check-label" for="setting-appLock">
                                 قفل التطبيق
                             </label>
@@ -855,13 +855,12 @@
                     <div class="col-md-6">
                         <label class="form-label">نوع القفل</label>
                         <select class="form-select" id="setting-lockType"
-                                onchange="AppSettings.update('security.lockType', this.value); toggleLockCredentials(this.value)">
+                                onchange="AppSettings.update('security.lockType', this.value); toggleLockCredentials(this.value); updateLockButton()">
                             <option value="none" ${security.lockType === 'none' ? 'selected' : ''}>بدون قفل</option>
                             <option value="pin" ${security.lockType === 'pin' ? 'selected' : ''}>رمز PIN</option>
                             <option value="password" ${security.lockType === 'password' ? 'selected' : ''}>كلمة مرور</option>
-                            <option value="pattern" ${security.lockType === 'pattern' ? 'selected' : ''}>نمط</option>
-                            <option value="biometric" ${security.lockType === 'biometric' ? 'selected' : ''}>بصمة</option>
                         </select>
+                        <div class="form-text">الخيارات المتاحة لتطبيق الويب</div>
                     </div>
                 </div>
 
@@ -925,14 +924,16 @@
                         <label class="form-label">رمز PIN (4-6 أرقام)</label>
                         <input type="password" class="form-control" id="setting-pin"
                                value="${security.pin || ''}" maxlength="6" placeholder="أدخل رمز PIN"
-                               onchange="AppSettings.update('security.pin', this.value)">
+                               onchange="AppSettings.update('security.pin', this.value); updateLockButton()"
+                               pattern="[0-9]{4,6}" title="4-6 أرقام فقط">
                         <div class="form-text">سيستخدم لفتح الشاشة المقفلة</div>
                     </div>
                     <div class="col-md-6" id="passwordSection" style="${security.lockType === 'password' ? '' : 'display:none'}">
                         <label class="form-label">كلمة المرور</label>
                         <input type="password" class="form-control" id="setting-password"
                                value="${security.password || ''}" placeholder="أدخل كلمة المرور"
-                               onchange="AppSettings.update('security.password', this.value)">
+                               onchange="AppSettings.update('security.password', this.value); updateLockButton()"
+                               minlength="4" title="4 أحرف على الأقل">
                         <div class="form-text">يجب أن تكون 8 أحرف على الأقل</div>
                     </div>
                 </div>
@@ -1811,6 +1812,14 @@
         
         if (passwordSection) {
             passwordSection.style.display = lockType === 'password' ? '' : 'none';
+        }
+    };
+    
+    // دالة تحديث ظهور زر القفل
+    window.updateLockButton = function() {
+        // استدعاء دالة التحديث من نظام القفل
+        if (typeof window.screenLock !== 'undefined' && window.screenLock.updateLockButtonVisibility) {
+            window.screenLock.updateLockButtonVisibility();
         }
     };
     
